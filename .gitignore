@@ -168,3 +168,6 @@ dist-ssr
 *.sw?
 
 /generated/prisma
+
+database.db
+prisma/migrations

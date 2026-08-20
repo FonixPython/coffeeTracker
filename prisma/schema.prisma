@@ -10,3 +10,49 @@ generator client {
 datasource db {
   provider = "sqlite"
 }
+
+model User {
+  id                 String        @id @default(dbgenerated("(uuid())"))
+  username           String        @unique
+  passwordHash       String
+  accepted           Boolean       @default(false)
+  pfpId              String        @default("")
+  admin              Boolean       @default(false)
+  dateOfRegistration DateTime      @default(dbgenerated("(curtime())"))
+  image              Image         @relation("UserProfilePicture", fields: [pfpId], references: [id])
+  transactions       Transaction[]
+  images             Image[]       @relation("UserUploadedImages")
+}
+
+model Pool {
+  id             String        @id @default(dbgenerated("(uuid())"))
+  name           String        @unique
+  dateOfCreation DateTime      @default(dbgenerated("(curtime())"))
+  transactions   Transaction[]
+}
+
+model Setting {
+  key  String @id @unique
+  data String
+}
+
+model Image {
+  id             String   @id @default(dbgenerated("(uuid())"))
+  userId         String
+  storedFilename String
+  dateOfUpload   DateTime @default(dbgenerated("(curtime())"))
+  user           User     @relation("UserUploadedImages", fields: [userId], references: [id])
+  users          User[]   @relation("UserProfilePicture")
+}
+
+model Transaction {
+  id                String   @id @default(dbgenerated("(uuid())"))
+  userId            String
+  poolId            String
+  type              String
+  moneyAmount       Int
+  coffeeAmount      Int
+  dateOfTransaction DateTime @default(dbgenerated("(curtime())"))
+  user              User     @relation(fields: [userId], references: [id])
+  pool              Pool     @relation(fields: [poolId], references: [id])
+}
