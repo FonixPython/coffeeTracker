@@ -1,0 +1,40 @@
+.loginPage {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loginPage .loginBox {
+    background-color: var(--bg-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 350px;
+    height: 450px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+}
+
+.loginBox form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 90%;
+    height: 100%;
+    margin-top: 70px;
+}
+
+.loginBox form * {
+    width: 90%;
+    margin-bottom: 15px;
+}
+
+.loginBox p {
+    user-select: none;
+    margin: 20px;
+    font-size: 3rem;
+    font-weight: 250;
+}
