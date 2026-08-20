@@ -1,0 +1,49 @@
+{
+  "name": "web-radio",
+  "version": "1.0.0",
+  "description": "A simple web radio with an admin interface, that streams music 24/7 written for Node",
+  "main": "index.js",
+  "scripts": {
+    "build:frontend": "cd client && vite build",
+    "build:backend": "cd backend && tsc",
+    "build": "npm run build:frontend && npm run build:backend",
+    "start": "node dist/index",
+    "dev": "cd client && vite dev",
+    "f": "npm run build && npm run start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FonixPython/Web-Radio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/FonixPython/Web-Radio/issues"
+  },
+  "homepage": "https://github.com/FonixPython/Web-Radio#readme",
+  "dependencies": {
+    "@prisma/adapter-better-sqlite3": "^7.9.1",
+    "@prisma/client": "^7.9.1",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.2",
+    "typescript": "^7.0.2"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.4",
+    "oxlint": "^1.75.0",
+    "prisma": "^7.9.1",
+    "typescript": "~6.0.2",
+    "vite": "^8.2.0"
+  }
+}
