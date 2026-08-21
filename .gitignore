@@ -171,3 +171,5 @@ dist-ssr
 
 database.db
 prisma/migrations
+
+.vscode
