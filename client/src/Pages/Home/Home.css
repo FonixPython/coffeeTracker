@@ -1,0 +1,75 @@
+.homePage {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.homePage .machineName {
+    font-weight: 200;
+    font-size: 1.5rem;
+}
+
+.homePage .userBalance {
+    font-weight: 500;
+    font-size: 2rem;
+}
+
+.homePage .coffeeBalance {
+    font-weight: 500;
+    font-size: 1.8rem;
+}
+
+.homePage .actionContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.homePage .actionContainer button {
+    margin: 10px;
+    margin-bottom: 0;
+    height: 100px;
+    border: 0;
+    border-radius: 10px;
+    font-size: 3rem;
+    font-weight: 400;
+    transition: 0.1s;
+}
+
+.homePage .actionContainer button:hover {
+    scale: 1.02;
+}
+
+.homePage .actionContainer button:active {
+    scale: 1.04;
+}
+
+.homePage .actionContainer:last-child {
+    margin-bottom: 10px;
+}
+
+.homePage .drinkAction {
+    background-color: var(--info);
+}
+
+.homePage .addCoffeeAction {
+    background-color: var(--warning);
+}
+
+.homePage .addMoneyAction {
+    background-color: var(--success);
+}
+
+.homePage .cardContainer {
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
+    flex-wrap: wrap;
+}
+
+@media (max-width:800px) {
+    .homePage .cardContainer {
+        display: flex;
+        flex-direction: column;
+    }
+}

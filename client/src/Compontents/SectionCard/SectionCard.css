@@ -1,0 +1,42 @@
+.sectionCard {
+    margin: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    background-color: var(--bg-dark);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    transition: 0.1s;
+}
+
+.sectionCard:hover {
+    border-color: var(--highlight);
+}
+
+.sectionCard .header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 5px;
+    border-radius: 10px;
+    height: 2rem;
+    align-items: center;
+}
+
+.sectionCard .header button {
+    width: 30px;
+    height: 30px;
+    background-color: transparent;
+    border: 0;
+    outline: 0;
+    font-size: 1.3rem;
+    transition: 0.1s;
+}
+
+.sectionCard .header p {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.sectionCard .content {
+    width: 100%;
+}

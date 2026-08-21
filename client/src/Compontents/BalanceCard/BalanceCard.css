@@ -1,0 +1,24 @@
+.balanceCard {
+    margin: 10px;
+    background-color: var(--bg-light);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+}
+
+.balanceCard .machineName {
+    font-weight: 200;
+    font-size: 1.5rem;
+    margin: 5px;
+}
+
+.balanceCard .userBalance {
+    font-weight: 500;
+    font-size: 2rem;
+    margin: 5px;
+}
+
+.balanceCard .coffeeBalance {
+    font-weight: 500;
+    font-size: 1.8rem;
+    margin: 5px;
+}
