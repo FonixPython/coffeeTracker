@@ -22,6 +22,14 @@ model User {
   image              Image         @relation("UserProfilePicture", fields: [pfpId], references: [id])
   transactions       Transaction[]
   images             Image[]       @relation("UserUploadedImages")
+  tokens             Token[]
+}
+
+model Token {
+  id          String   @id @default(dbgenerated("(uuid())"))
+  userId      String
+  dateOfLogin DateTime @default(dbgenerated("(curtime())"))
+  user        User     @relation(fields: [userId], references: [id])
 }
 
 model Pool {
