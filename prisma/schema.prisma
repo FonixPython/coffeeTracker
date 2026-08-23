@@ -54,13 +54,21 @@ model Image {
 }
 
 model Transaction {
-  id                String   @id @default(dbgenerated("(uuid())"))
+  id                String          @id @default(dbgenerated("(uuid())"))
   userId            String
   poolId            String
   type              String
   moneyAmount       Int
   coffeeAmount      Int
-  dateOfTransaction DateTime @default(dbgenerated("(curtime())"))
-  user              User     @relation(fields: [userId], references: [id])
-  pool              Pool     @relation(fields: [poolId], references: [id])
+  coffeeVariationId String
+  dateOfTransaction DateTime        @default(dbgenerated("(curtime())"))
+  user              User            @relation(fields: [userId], references: [id])
+  pool              Pool            @relation(fields: [poolId], references: [id])
+  coffeevariation   CoffeeVariation @relation(fields: [coffeeVariationId], references: [id])
+}
+
+model CoffeeVariation {
+  id           String        @id @unique
+  coffeeAmount Int
+  transactions Transaction[]
 }
