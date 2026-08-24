@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { login, register, logout, checkAuth, deleteUser, editUser, changePassword } from './Controllers/userController.js';
 import { addTransaction, deleteTransaction, editTransaction, getBalances, getCoffeeVariations, getTransactions } from './Controllers/userActionController.js';
 import { authenticateAdmin, authenticateUser } from './auth.js';
-import { addPool, deletePool, editPool, getAllUsers, getPools } from './Controllers/adminActionController.js';
+import { addPool, addVariation, deletePool, deleteVariation, editPool, editVariation, getAllUsers, getPools } from './Controllers/adminActionController.js';
 
 export const router = express.Router();
 
@@ -32,8 +32,13 @@ router.delete("/api/deleteTransaction/:transactionId", authenticateUser, deleteT
 
 // Actions for admin
 router.get("/api/getAllUsers", authenticateAdmin, getAllUsers)
-// Pool actions
+
+
 router.get("/api/getPools", authenticateAdmin, getPools)
 router.post("/api/addPool", authenticateAdmin, addPool)
 router.post("/api/editPool/:poolId", authenticateAdmin, editPool)
 router.delete("/api/deletePool/:poolId", authenticateAdmin, deletePool)
+
+router.post("/api/addVariation", authenticateAdmin, addVariation)
+router.post("/api/editVariation", authenticateAdmin, editVariation)
+router.delete("/api/deleteVariation", authenticateAdmin, deleteVariation)

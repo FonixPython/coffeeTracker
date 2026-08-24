@@ -77,16 +77,6 @@ export async function deletePool(req: Request, res: Response) {
 
 // Variations CRUD
 
-export async function getVariations(req: Request, res: Response) {
-    try {
-        const result = await prisma.coffeeVariation.findMany()
-        return res.json({ message: "Successfully retrieved variations!", result: null }).status(500)
-    } catch (e) {
-        console.log(e)
-        return res.json({ message: "Internal server error!", result: null }).status(500)
-    }
-}
-
 export async function addVariation(req: Request, res: Response) {
     try {
         if (!req.body.name || !req.body.coffeeAmount) {
