@@ -99,10 +99,22 @@ export async function checkUser(username: string) {
 export async function authenticateUser(req: Request & Record<string, any>, res: Response, next: NextFunction) {
     const auth = extractToken(req);
     if (!auth) return res.sendStatus(401);
-    let userPermission = await validateUserToken(auth, null);
+    let userPermission = await validateUserToken(auth, "user");
     if (!userPermission.user) { return res.sendStatus(401) }
-    if (userPermission.user.permission === "none") { return res.sendStatus(401); }
-    req.user = { id: userPermission.user.id };
+    if (!userPermission.met) { return res.sendStatus(401); }
+    req.user = { id: userPermission.user };
     next();
 }
+
+export async function authenticateAdmin(req: Request & Record<string, any>, res: Response, next: NextFunction) {
+    const auth = extractToken(req);
+    if (!auth) return res.sendStatus(401);
+    let userPermission = await validateUserToken(auth, "admin");
+    if (!userPermission.user) { return res.sendStatus(401) }
+    if (!userPermission.met) { return res.sendStatus(401); }
+    req.user = { id: userPermission.user };
+    next();
+}
+
+
 
