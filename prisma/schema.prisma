@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,63 +7,64 @@ datasource db {
 }
 
 model User {
-  id                 String        @id @default(dbgenerated("(uuid())"))
+  id                 String        @id @default(uuid())
   username           String        @unique
   passwordHash       String
   accepted           Boolean       @default(false)
-  pfpId              String        @default("")
+  pfpId              String?
   admin              Boolean       @default(false)
-  dateOfRegistration DateTime      @default(dbgenerated("(curtime())"))
-  image              Image         @relation("UserProfilePicture", fields: [pfpId], references: [id])
-  transactions       Transaction[]
+  dateOfRegistration DateTime      @default(now())
   images             Image[]       @relation("UserUploadedImages")
   tokens             Token[]
+  transactions       Transaction[]
+  image              Image?        @relation("UserProfilePicture", fields: [pfpId], references: [id])
 }
 
 model Token {
-  id          String   @id @default(dbgenerated("(uuid())"))
+  id          String   @id @default(uuid())
   userId      String
-  dateOfLogin DateTime @default(dbgenerated("(curtime())"))
+  userAgent   String
+  dateOfLogin DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id])
 }
 
 model Pool {
-  id             String        @id @default(dbgenerated("(uuid())"))
+  id             String        @id @default(uuid())
   name           String        @unique
-  dateOfCreation DateTime      @default(dbgenerated("(curtime())"))
+  dateOfCreation DateTime      @default(now())
   transactions   Transaction[]
 }
 
 model Setting {
-  key  String @id @unique
+  key  String @id
   data String
 }
 
 model Image {
-  id             String   @id @default(dbgenerated("(uuid())"))
+  id             String   @id @default(uuid())
   userId         String
   storedFilename String
-  dateOfUpload   DateTime @default(dbgenerated("(curtime())"))
+  dateOfUpload   DateTime @default(now())
   user           User     @relation("UserUploadedImages", fields: [userId], references: [id])
   users          User[]   @relation("UserProfilePicture")
 }
 
 model Transaction {
-  id                String          @id @default(dbgenerated("(uuid())"))
+  id                String          @id @default(uuid())
   userId            String
   poolId            String
   type              String
   moneyAmount       Int
   coffeeAmount      Int
   coffeeVariationId String
-  dateOfTransaction DateTime        @default(dbgenerated("(curtime())"))
-  user              User            @relation(fields: [userId], references: [id])
-  pool              Pool            @relation(fields: [poolId], references: [id])
+  dateOfTransaction DateTime        @default(now())
   coffeevariation   CoffeeVariation @relation(fields: [coffeeVariationId], references: [id])
+  pool              Pool            @relation(fields: [poolId], references: [id])
+  user              User            @relation(fields: [userId], references: [id])
 }
 
 model CoffeeVariation {
-  id           String        @id @unique
+  id           String        @id
   coffeeAmount Int
   transactions Transaction[]
 }

@@ -15,7 +15,7 @@ export async function login(req: Request, res: Response) {
         }
         let login_result = await loginUser(username, password, req.headers['user-agent'] || null)
         if (login_result.success) {
-            res.cookie("session_token", login_result.token, {
+            res.cookie("sessionToken", login_result.token, {
                 httpOnly: true,
                 secure: false,
                 sameSite: "lax",
@@ -23,7 +23,10 @@ export async function login(req: Request, res: Response) {
             });
             return res.status(200).json({ message: login_result.message, token: login_result.token });
         }
-        else { return res.status(400).json({ message: login_result.message, token: null }); }
+        if (login_result.message == "User account unapproved!") {
+            return res.status(403).json({ message: login_result.message, token: null })
+        }
+        else { return res.status(401).json({ message: login_result.message, token: null }); }
     } catch (e) {
         console.log(e)
         return res.status(500).json({ message: "Internal server error!", token: null });
@@ -35,11 +38,12 @@ export async function register(req: Request, res: Response) {
         const username = req.body.username
         const password = req.body.password
         if (!username || !password) {
-            return res.json({ message: "Invalid request, must contain username and password!" }).status(400)
+            return res.status(400).json({ message: "Invalid request, must contain username and password!" })
         }
         const existsResult = await prisma.user.findMany({ where: { username: username } })
         if (existsResult.length != 0) {
-            return res.json({ message: "User already exists!" }).status(409)
+            console.log(existsResult.length)
+            return res.status(409).json({ message: "User already exists!" })
         }
         const token = extractToken(req)
         if (token) {
@@ -49,51 +53,64 @@ export async function register(req: Request, res: Response) {
                     data: {
                         username: username,
                         passwordHash: await bcrypt.hash(password, 10),
-                        accepted: true
+                        accepted: true,
+                        pfpId: null
                     }
                 })
-                return res.json({ message: "User successfully created!" }).status(200)
+                return res.status(200).json({ message: "User successfully created!" })
             } else {
+                const users = await prisma.user.findMany()
                 const creationResult = await prisma.user.create({
                     data: {
                         username: username,
                         passwordHash: await bcrypt.hash(password, 10),
-                        accepted: false
+                        accepted: users.length == 0 ? true : false,
+                        admin: users.length == 0 ? true : false,
+                        pfpId: null
                     }
                 })
+                if (!creationResult) {
+                    return res.status(500).json({ message: "Internal server error!" })
+                }
                 const sessionToken = await generateSession(creationResult.id, req.headers['user-agent'] || null)
                 if (sessionToken) {
-                    res.cookie("session_token", sessionToken, {
+                    res.cookie("sessionToken", sessionToken, {
                         httpOnly: true,
                         secure: false,
                         sameSite: "lax",
                         maxAge: 1000 * 60 * 60 * 24 * 90
                     });
                 }
-                return res.json({ message: "User successfully created!" }).status(200)
+                return res.status(200).json({ message: "User successfully created!" })
             }
         } else {
+            const users = await prisma.user.findMany()
             const creationResult = await prisma.user.create({
                 data: {
                     username: username,
                     passwordHash: await bcrypt.hash(password, 10),
-                    accepted: false
+                    accepted: users.length == 0 ? true : false,
+                    admin: users.length == 0 ? true : false,
+                    pfpId: null
                 }
             })
+            if (!creationResult) {
+                return res.status(500).json({ message: "Internal server error!" })
+            }
             const sessionToken = await generateSession(creationResult.id, req.headers['user-agent'] || null)
             if (sessionToken) {
-                res.cookie("session_token", sessionToken, {
+                res.cookie("sessionToken", sessionToken, {
                     httpOnly: true,
                     secure: false,
                     sameSite: "lax",
                     maxAge: 1000 * 60 * 60 * 24 * 90
                 });
             }
-            return res.json({ message: "User successfully created!" }).status(200)
+            return res.status(200).json({ message: "User successfully created!" })
         }
     } catch (e) {
         console.log(e)
-        return res.json({ message: "Internal server error!" }).status(500)
+        return res.status(500).json({ message: "Internal server error!" })
     }
 }
 
@@ -101,14 +118,14 @@ export async function logout(req: Request, res: Response) {
     try {
         const token = extractToken(req)
         if (!token) {
-            return res.json({ message: "No token!" }).status(200)
+            return res.status(200).json({ message: "No token!" })
         }
         await prisma.token.delete({ where: { id: token } })
-        return res.json({ message: "Successfully logged out!" }).status(200)
+        return res.status(200).json({ message: "Successfully logged out!" })
 
     } catch (e) {
         console.log(e)
-        return res.json({ message: "Internal server error!" }).status(500)
+        return res.status(500).json({ message: "Internal server error!" })
     }
 }
 
@@ -118,27 +135,27 @@ export async function deleteUser(req: Request & Record<string, any>, res: Respon
             where: { id: req.user.id }
         })
         if (!result) {
-            return res.json({ message: "Failed to delete user!" }).status(500)
+            return res.status(500).json({ message: "Failed to delete user!" })
         }
     } catch (e) {
         console.log(e)
-        return res.json({ message: "Internal server error!" }).status(500)
+        return res.status(500).json({ message: "Internal server error!" })
     }
 }
 
 export async function checkAuth(req: Request & Record<string, any>, res: Response) {
     try {
-        return res.json({ message: "Successfully retrieved user info!", user: req.user }).status(200)
+        return res.status(200).json({ message: "Successfully retrieved user info!", user: req.user })
     } catch (e) {
         console.log(e)
-        return res.json({ message: "Internal server error!", user: null }).status(500)
+        return res.status(500).json({ message: "Internal server error!", user: null })
     }
 }
 
 export async function editUser(req: Request & Record<string, any>, res: Response) {
     try {
         if (!req.body.username || !req.body.accepted || !req.body.pfpId || !req.body.admin) {
-            return res.json({ message: "Invalid request, must contain all user properties!" }).status(400)
+            return res.status(400).json({ message: "Invalid request, must contain all user properties!" })
         }
         let result
         if (req.user.permission == "admin" && req.body.id) {
@@ -161,12 +178,12 @@ export async function editUser(req: Request & Record<string, any>, res: Response
             })
         }
         if (!result) {
-            return res.json({ message: "User not found!" }).status(404)
+            return res.status(404).json({ message: "User not found!" })
         }
-        return res.json({ message: "Successfully edited user!" }).status(200)
+        return res.status(200).json({ message: "Successfully edited user!" })
     } catch (e) {
         console.log(e)
-        return res.json({ message: "Internal server error!" }).status(500)
+        return res.status(500).json({ message: "Internal server error!" })
     }
 }
 
@@ -175,7 +192,7 @@ export async function changePassword(req: Request & Record<string, any>, res: Re
         const oldPassword = req.body.oldPassword
         const newPassword = req.body.newPassword
         if (!oldPassword || !newPassword) {
-            return res.json({ message: "Invalid request!" }).status(401)
+            return res.status(401).json({ message: "Invalid request!" })
         }
         const currentUser = await prisma.user.findFirstOrThrow({ where: { id: req.user.id } })
         if (await bcrypt.compare(oldPassword, currentUser.passwordHash) || req.user.permission == "admin") {
@@ -185,13 +202,13 @@ export async function changePassword(req: Request & Record<string, any>, res: Re
                 }
             })
             if (!result) {
-                return res.json({ message: "Internal server error!" }).status(500)
+                return res.status(500).json({ message: "Internal server error!" })
             }
-            return res.json({ message: "Successfully changed password!" }).status(200)
+            return res.status(200).json({ message: "Successfully changed password!" })
         }
-        return res.json({ message: "Old password is incorrect!" }).status(401)
+        return res.status(401).json({ message: "Old password is incorrect!" })
     } catch (e) {
         console.log(e)
-        return res.json({ message: "Internal server error!" }).status(500)
+        return res.status(500).json({ message: "Internal server error!" })
     }
 }

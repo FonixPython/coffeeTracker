@@ -8,7 +8,7 @@ export interface UserObject {
     id: string,
     username: string,
     accepted: boolean,
-    pfpId: string,
+    pfpId: string | null,
     permission: PermissionLevel,
     dateOfRegistration: Date
 }
@@ -25,7 +25,7 @@ export interface loginResponse {
 }
 
 export function extractToken(req: Request): string | null {
-    return req.cookies?.sessionToken || req.headers.authorization || null
+    return req.cookies.sessionToken || req.headers.authorization || null
 }
 
 export async function validateUserToken(token: string, validateTo: PermissionLevel | null): Promise<PermissionResponse> {
@@ -56,7 +56,7 @@ export async function generateSession(userId: string, userAgent: string | null):
     try {
         let agentText: string = ""
         if (userAgent !== null) { agentText = userAgent }
-        let result = await prisma.token.create({ data: { userId: userId, user_agent: agentText } })
+        let result = await prisma.token.create({ data: { userId: userId, userAgent: agentText } })
         return result.id;
     } catch (err) {
         console.log(err)
@@ -69,6 +69,9 @@ export async function loginUser(username: string, password: string, userAgent: s
         const userResult = await prisma.user.findUniqueOrThrow({ where: { username: username } })
         const isMatch = await bcrypt.compare(password, userResult.passwordHash);
         if (isMatch) {
+            if (!userResult.accepted) {
+                return { token: null, success: false, message: "User account unapproved!" }
+            }
             let newToken: string | null = await generateSession(userResult.id, userAgent)
             if (newToken === null) { return { token: null, success: false, message: "Failed to generate token!" } }
             else { return { token: newToken, success: true, message: "Success" } }
@@ -102,7 +105,7 @@ export async function authenticateUser(req: Request & Record<string, any>, res: 
     let userPermission = await validateUserToken(auth, "user");
     if (!userPermission.user) { return res.sendStatus(401) }
     if (!userPermission.met) { return res.sendStatus(401); }
-    req.user = { id: userPermission.user };
+    req.user = userPermission.user
     next();
 }
 
@@ -112,7 +115,7 @@ export async function authenticateAdmin(req: Request & Record<string, any>, res:
     let userPermission = await validateUserToken(auth, "admin");
     if (!userPermission.user) { return res.sendStatus(401) }
     if (!userPermission.met) { return res.sendStatus(401); }
-    req.user = { id: userPermission.user };
+    req.user = userPermission.user
     next();
 }
 

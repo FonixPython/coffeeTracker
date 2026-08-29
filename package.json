@@ -33,15 +33,19 @@
     "@prisma/client": "^7.9.1",
     "@types/bcrypt": "^6.0.0",
     "bcrypt": "^6.0.0",
+    "better-sqlite3": "^13.0.3",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.2",
+    "sonner": "^2.0.8",
     "typescript": "^7.0.2"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^9.6.0",
+    "@types/cookie-parser": "^1.4.10",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.6",
     "@types/node": "^24.13.3",
@@ -52,5 +56,9 @@
     "prisma": "^7.9.1",
     "typescript": "~6.0.2",
     "vite": "^8.2.0"
+  },
+  "allowScripts": {
+    "better-sqlite3@12.11.1": true,
+    "better-sqlite3@13.0.3": true
   }
 }

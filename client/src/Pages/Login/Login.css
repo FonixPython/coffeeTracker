@@ -24,7 +24,7 @@
     justify-content: flex-start;
     width: 90%;
     height: 100%;
-    margin-top: 70px;
+    margin-top: 50px;
 }
 
 .loginBox form * {
@@ -37,4 +37,28 @@
     margin: 20px;
     font-size: 3rem;
     font-weight: 250;
+}
+
+.loginBox .modeSwitcher {
+    user-select: none;
+    font-size: 1.3rem;
+    margin: 3px;
+    text-align: center;
+    text-decoration: underline;
+    transition: 0.1s;
+}
+
+.loginBox .modeSwitcher:hover {
+    scale: 1.1;
+    color: var(--secondary);
+    text-shadow: 1px 1px 10px var(--secondary), 1px 1px 10px var(--secondary);
+    ;
+}
+
+.loginPage .login {
+    filter: drop-shadow(0, 0, 1rem var(--secondary))
+}
+
+.loginPage .register {
+    filter: drop-shadow(0, 0, 1rem var(--primary))
 }

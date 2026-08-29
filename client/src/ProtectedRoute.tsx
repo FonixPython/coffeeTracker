@@ -1,7 +1,12 @@
 import { Navigate, Outlet } from 'react-router-dom'
-export const ProtectedRoute = () => {
-    let auth = { 'token': true }
+
+interface ProtectedRouteProps {
+    allow: boolean;
+    to: string
+}
+
+export const ProtectedRoute = ({ allow, to }: ProtectedRouteProps) => {
     return (
-        auth.token ? <Outlet /> : <Navigate to='/login' />
+        allow ? <Outlet /> : <Navigate to={to} />
     )
 }
