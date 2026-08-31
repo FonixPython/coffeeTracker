@@ -67,6 +67,13 @@
     flex-wrap: wrap;
 }
 
+.topCard select {
+    text-align: left;
+    background-color: transparent;
+    border: 0;
+    outline: none;
+}
+
 @media (max-width:800px) {
     .homePage .cardContainer {
         display: flex;

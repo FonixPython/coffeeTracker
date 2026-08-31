@@ -15,10 +15,10 @@ export async function getBalances(req: Request & Record<string, any>, res: Respo
                 coffeeAmount: coffeeAmount._sum
             })
         }
-        return res.json({ message: "Successfully retrieved balances!" })
+        return res.json({ message: "Successfully retrieved balances!", result: resultObject })
     } catch (e) {
         console.log(e)
-        return res.json({ message: "Internal server error!", result: null }).status(500)
+        return res.status(500).json({ message: "Internal server error!", result: [] })
     }
 }
 
@@ -34,10 +34,10 @@ export async function getTransactions(req: Request & Record<string, any>, res: R
                 edit: currentTime - transactions[i].dateOfTransaction.getTime() < 1000 * 60 * 60
             })
         }
-        return res.json({ message: "Successfully retrieved transactions!", result: transactions }).status(200)
+        return res.json({ message: "Successfully retrieved transactions!", result: transactions || [] }).status(200)
     } catch (e) {
         console.log(e)
-        return res.json({ message: "Internal server error!", result: null })
+        return res.status(500).json({ message: "Internal server error!", result: [] })
     }
 }
 
@@ -60,7 +60,7 @@ export function calculateCoffeeCost(poolId: string): number | null {
 export async function addTransaction(req: Request & Record<string, any>, res: Response) {
     try {
         if (!req.body.poolId || !req.body.moneyAmount || !req.body.coffeeAmount || !req.body.type || !req.body.coffeeVariation) {
-            return res.json({ message: "Invalid request!", result: null }).status(400)
+            return res.status(400).json({ message: "Invalid request!", result: null })
         }
         const data = {
             coffeeAmount: req.body.coffeeAmount,
@@ -70,7 +70,7 @@ export async function addTransaction(req: Request & Record<string, any>, res: Re
             case "drink":
                 const coffeeCost = calculateCoffeeCost(req.body.poolId)
                 if (!coffeeCost) {
-                    return res.json({ message: "No coffee" }).status(500)
+                    return res.status(500).json({ message: "No coffee" })
                 }
                 const variation = await prisma.coffeeVariation.findFirstOrThrow({ where: { id: req.body.coffeeVariation } })
                 data.coffeeAmount = variation.coffeeAmount * -1
@@ -85,7 +85,7 @@ export async function addTransaction(req: Request & Record<string, any>, res: Re
                 data.coffeeAmount = 0
                 break
             default:
-                return res.json({ message: "Invalid transaction type!" }).status(400)
+                return res.status(400).json({ message: "Invalid transaction type!" })
         }
         const result = await prisma.transaction.create({
             data: {
@@ -98,21 +98,21 @@ export async function addTransaction(req: Request & Record<string, any>, res: Re
             }
         })
         if (!result) {
-            return res.json({ message: "Internal server error!" }).status(500)
+            return res.status(500).json({ message: "Internal server error!" })
         } else {
-            return res.json({ message: "Successfully added transaction!" }).status(200)
+            return res.status(200).json({ message: "Successfully added transaction!" })
         }
 
     } catch (e) {
         console.log(e)
-        return res.json({ message: "Internal server error!" }).status(500)
+        return res.status(500).json({ message: "Internal server error!" })
     }
 }
 
 export async function editTransaction(req: Request & Record<string, any>, res: Response) {
     try {
         if (!req.params.transactionId || !req.body.moneyAmount || !req.body.coffeeAmount || !req.body.type || !req.body.coffeeVariation) {
-            return res.json({ message: "Invalid request!", result: null }).status(400)
+            return res.status(400).json({ message: "Invalid request!", result: null })
         }
         const transactionId = Array.isArray(req.params.transactionId) ? req.params.transactionId[0] : req.params.transactionId;
         const data = {
@@ -124,7 +124,7 @@ export async function editTransaction(req: Request & Record<string, any>, res: R
             case "drink":
                 const coffeeCost = calculateCoffeeCost(before.poolId)
                 if (!coffeeCost) {
-                    return res.json({ message: "No coffee" }).status(500)
+                    return res.status(500).json({ message: "No coffee" })
                 }
                 const variation = await prisma.coffeeVariation.findFirstOrThrow({ where: { id: req.body.coffeeVariation } })
                 data.coffeeAmount = variation.coffeeAmount * -1
@@ -139,10 +139,10 @@ export async function editTransaction(req: Request & Record<string, any>, res: R
                 data.coffeeAmount = 0
                 break
             default:
-                return res.json({ message: "Invalid transaction type!" }).status(400)
+                return res.status(400).json({ message: "Invalid transaction type!" })
         }
         if (req.user.permission == "user" && Date.now() - before.dateOfTransaction.getTime() < 1000 * 60 * 60) {
-            return res.json({ message: "Transaction too old to edit!" }).status(401)
+            return res.status(401).json({ message: "Transaction too old to edit!" })
         }
 
         const result = await prisma.transaction.update({
@@ -155,43 +155,40 @@ export async function editTransaction(req: Request & Record<string, any>, res: R
             }
         })
         if (!result) {
-            return res.json({ message: "Can't edit transaction!" }).status(401)
+            return res.status(401).json({ message: "Can't edit transaction!" })
         }
     } catch (e) {
         console.log(e)
-        return res.json({ message: "Internal server error!" }).status(500)
+        return res.status(500).json({ message: "Internal server error!" })
     }
 }
 
 export async function deleteTransaction(req: Request & Record<string, any>, res: Response) {
     try {
         if (!req.params.transactionId) {
-            return res.json({ message: "Invalid request!", result: null }).status(400)
+            return res.status(400).json({ message: "Invalid request!", result: null })
         }
         const transactionId = Array.isArray(req.params.transactionId) ? req.params.transactionId[0] : req.params.transactionId;
         const result = await prisma.transaction.delete({
             where: req.user.permission == "user" ? { id: transactionId, userId: req.user.id } : { id: transactionId }
         })
         if (!result) {
-            return res.json({ message: "Can't delete transaction!" }).status(401)
+            return res.status(401).json({ message: "Can't delete transaction!" })
         }
-        return res.json({ message: "Successfully deleted transaction!" }).status(401)
+        return res.status(401).json({ message: "Successfully deleted transaction!" })
     } catch (e) {
         console.log(e)
-        return res.json({ message: "Internal server error!" }).status(500)
+        return res.status(500).json({ message: "Internal server error!" })
     }
 }
 
 export async function getCoffeeVariations(req: Request, res: Response) {
     try {
-        if (!req.params.poolId) {
-            return res.json({ message: "Invalid request!", result: null }).status(400)
-        }
         const result = await prisma.coffeeVariation.findMany()
         return res.json({ message: "Successfully retrieved coffee variations!", result: result }).status(200)
     } catch (e) {
         console.log(e)
-        return res.json({ message: "Internal server error!", result: null }).status(500)
+        return res.status(500).json({ message: "Internal server error!", result: null })
     }
 }
 
