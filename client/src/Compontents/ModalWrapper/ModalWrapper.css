@@ -1,0 +1,53 @@
+.screenCover {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: color-mix(in srgb, var(--bg-dark) 100%, transparent 50%);
+}
+
+.modalWrapper {
+    min-width: 350px;
+    background-color: var(--bg-light);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.modalWrapper .titleBar {
+    height: 40px;
+    font-size: 1.2rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin: 5px;
+}
+
+.modalWrapper .titleBar button {
+    height: 30px;
+    width: 30px;
+    background-color: var(--bg-light);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    transition: 0.1s ease-in;
+}
+
+.modalWrapper .titleBar button:hover {
+    scale: 1.15;
+    background-color: var(--highlight);
+}
+
+.modalWrapper .titleBar button:active {
+    background-color: var(--secondary);
+}
+
+.modalWrapper .contentWrapper {
+    margin: 5px;
+}
