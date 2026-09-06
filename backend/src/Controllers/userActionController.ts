@@ -11,8 +11,8 @@ export async function getBalances(req: Request & Record<string, any>, res: Respo
             resultObject.push({
                 poolId: pools[i].id,
                 poolName: pools[i].name,
-                moneyBalance: moneyAmount._sum,
-                coffeeAmount: coffeeAmount._sum
+                moneyBalance: moneyAmount._sum.moneyAmount,
+                coffeeAmount: coffeeAmount._sum.coffeeAmount
             })
         }
         return res.json({ message: "Successfully retrieved balances!", result: resultObject })

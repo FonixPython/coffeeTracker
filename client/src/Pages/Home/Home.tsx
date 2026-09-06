@@ -84,7 +84,7 @@ export function HomePage() {
     }, [])
 
     async function handleActionButton(e) {
-        if (!pool) {
+        if (pool == "") {
             toast.error("No pool selected!")
         }
     }
@@ -96,7 +96,7 @@ export function HomePage() {
                 <SectionCard>
                     <div style={{ margin: 10 }} className="topCard">
                         <select value={pool || ""} onChange={(e) => { setPool(e.target.value) }} className="machineName">
-                            {balances.map((pool) => (<option value={pool.poolId}>{pool.poolName}</option>))}
+                            {balances.map((balance) => (<option key={balance.poolId} value={balance.poolId}>{balance.poolName}</option>))}
                         </select>
                         <p className="userBalance">{pool ? balances.filter(value => (value.poolId == pool))[0].moneyAmount : "-"} Ft</p>
                         <p className="coffeeBalance">{pool ? balances.filter(value => (value.poolId == pool))[0].coffeeAmount / 1000 : "-"} kg</p>

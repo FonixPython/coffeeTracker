@@ -18,7 +18,7 @@ export async function getAllUsers(req: Request, res: Response) {
 export async function getPools(req: Request, res: Response) {
     try {
         const result = await prisma.pool.findMany({ include: { transactions: true } })
-        return res.json({ message: "Successfully retrieved pools!", result: null }).status(500)
+        return res.json({ message: "Successfully retrieved pools!", result: result }).status(500)
     } catch (e) {
         console.log(e)
         return res.json({ message: "Internal server error!", result: null }).status(500)
