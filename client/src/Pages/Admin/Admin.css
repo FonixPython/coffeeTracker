@@ -8,5 +8,28 @@
     text-align: center;
     font-size: 1rem;
     display: inline-block;
-    flex: 1;
+    transition: 0.1s;
+}
+
+.adminPage button:hover {
+    scale: 1.01;
+    border-color: var(--secondary);
+    color: var(--secondary);
+}
+
+.adminPage .actionButton {
+    margin: 5px 5px;
+    background-color: var(--bg-light);
+    border: 2px solid var(--border);
+    padding: 5px;
+    border-radius: 10px;
+    color: var(--text);
+    text-align: center;
+    font-size: 1rem;
+    display: inline-block;
+}
+
+.dangerButton:hover {
+    border-color: var(--danger) !important;
+    color: var(--danger) !important;
 }

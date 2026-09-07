@@ -22,7 +22,7 @@
     align-items: center;
 }
 
-.sectionCard .header button {
+.sectionCard .header .collapseButton {
     width: 30px;
     height: 30px;
     background-color: transparent;

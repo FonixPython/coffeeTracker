@@ -6,10 +6,15 @@ import { ModalWrapper } from "../../Compontents/ModalWrapper/ModalWrapper"
 import { useEffect, useState } from "react"
 import { Toaster, toast } from "sonner"
 import type { SubmitEvent } from "react"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faPlus } from "@fortawesome/free-solid-svg-icons"
 
 export function AdminPage() {
     const [modalOpened, setModalOpened] = useState<boolean>()
-    const [modal, setModal] = useState(<></>)
+    const [modal, setModal] = useState({
+        title: "",
+        elements: <></>,
+    })
 
     const [pools, setPools] = useState<Pool[]>()
 
@@ -36,7 +41,8 @@ export function AdminPage() {
         })
         if (result.ok) {
             setModalOpened(false)
-            setModal(<></>)
+            setModal({ title: "", elements: <></> })
+            loadPools()
         } else {
             const jsonResult = await result.json()
             toast.error(jsonResult.message)
@@ -44,14 +50,30 @@ export function AdminPage() {
     }
 
     function addPoolModal() {
-        setModal(
-            <form action="" onSubmit={createPool} >
-                <input type="text" placeholder="Pool name..." required={true} />
-                <button >Cancel</button>
-                <input type="submit" value="Create" />
-            </form>
-        )
+        setModal({
+            title: "Add pool",
+            elements:
+                <form action="" onSubmit={createPool} >
+                    <input type="text" name="name" placeholder="Pool name..." required={true} />
+                    <input type="submit" value="Create" />
+                    <input type="button" className="dangerButton" onClick={() => {
+                        setModalOpened(false)
+                        setModal({ title: "", elements: <></> })
+                    }} value="Cancel" />
+                </form>
+        })
         setModalOpened(true)
+    }
+
+    function confirmationModal(confirmText: string) {
+        setModal({
+            title: "Confirmation",
+            elements:
+                <div>
+                    <button className="dangerButton">{confirmText || "Do it!"}</button>
+                    <button className="actionButton">Cancel</button>
+                </div>
+        })
     }
 
     useEffect(() => {
@@ -61,13 +83,15 @@ export function AdminPage() {
     return (
         <>
             <Toaster />
-            <ModalWrapper isopen={modalOpened} setOpen={setModalOpened} title="Test modal">
-                {modal}
+            <ModalWrapper isopen={modalOpened} setOpen={setModalOpened} title={modal.title}>
+                {modal.elements}
             </ModalWrapper>
             <main className="adminPage">
-                <SectionCard title="Pools" collapseable>
-                    <button onClick={addPoolModal}>Add Pool</button>
-                    <AdminPools pools={pools || []} />
+                <SectionCard title="Pools" collapseable headerChildren={
+                    <button onClick={addPoolModal}>Add Pool <FontAwesomeIcon icon={faPlus} /></button>
+                }>
+                    <hr />
+                    <AdminPools pools={pools || []} setModal={setModal} setModalOpened={setModalOpened} reload={loadPools} />
                 </SectionCard>
                 <SectionCard title="Variations" collapseable>
                     <button>Add variation</button>

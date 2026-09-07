@@ -9,7 +9,7 @@ import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
 
 export function HomePage() {
-    let [searchParams] = useSearchParams()
+    const [searchParams, setSearchParams] = useSearchParams()
     const [currWidth, setCurrWidth] = useState(window.innerWidth)
     const handleResize = (e) => {
         setCurrWidth(window.innerWidth)
@@ -22,7 +22,7 @@ export function HomePage() {
     const [balances, setBalances] = useState([])
     const [transactions, setTransactions] = useState([])
     const [variations, setVariations] = useState([])
-    const [pool, setPool] = useState<string | null>(null)
+    const [pool, setPool] = useState<string | null>(searchParams.get("pool") || null)
     const [uiEnabled, setUiEnabled] = useState(false)
 
     async function loadUserData() {
@@ -31,6 +31,13 @@ export function HomePage() {
             if (balancesResult.ok) {
                 const balancesJsonResult = await balancesResult.json()
                 setBalances(balancesJsonResult.result)
+                if (searchParams.get("pool") != null) {
+                    setPool(searchParams.get("pool"))
+                } else if (balances.length != 0) {
+                    setPool(balancesJsonResult.result.poolId)
+                } else {
+                    setPool(null)
+                }
             } else {
                 throw Error("Error fetching balances!")
             }
@@ -43,16 +50,6 @@ export function HomePage() {
             } else {
                 throw Error("Error fetching variations!")
             }
-
-            if (searchParams.get("pool") != null) {
-                setPool(searchParams.get("pool"))
-            } else if (balances.length != 0) {
-                setPool(balances[0].poolId)
-            } else {
-                setPool(null)
-            }
-
-            await getPoolTransactions()
         } catch (e) {
             console.log(e)
             toast.error("Something went wrong when loading user data! Try reloading the page!")
@@ -62,7 +59,7 @@ export function HomePage() {
     async function getPoolTransactions() {
         try {
             if (pool) {
-                const transactionsResult = await fetch("/api/getTransactions")
+                const transactionsResult = await fetch("/api/getTransactions/" + pool)
                 if (transactionsResult.ok) {
                     const transactionsJsonResult = await transactionsResult.json()
                     setTransactions(transactionsJsonResult.result)
@@ -83,11 +80,19 @@ export function HomePage() {
         loadUserData()
     }, [])
 
+    useEffect(() => {
+        getPoolTransactions()
+    }, [pool])
+
     async function handleActionButton(e) {
-        if (pool == "") {
+        if (!pool) {
             toast.error("No pool selected!")
         }
     }
+
+    const selectedBalance = balances.find(
+        balance => balance.poolId === pool
+    )
 
     return (
         <>
@@ -95,11 +100,15 @@ export function HomePage() {
             <main className="homePage">
                 <SectionCard>
                     <div style={{ margin: 10 }} className="topCard">
-                        <select value={pool || ""} onChange={(e) => { setPool(e.target.value) }} className="machineName">
+                        <select value={pool || ""} onChange={(e) => {
+                            const newPool = e.target.value
+                            setPool(newPool)
+                            setSearchParams({ pool: newPool })
+                        }} className="machineName">
                             {balances.map((balance) => (<option key={balance.poolId} value={balance.poolId}>{balance.poolName}</option>))}
                         </select>
-                        <p className="userBalance">{pool ? balances.filter(value => (value.poolId == pool))[0].moneyAmount : "-"} Ft</p>
-                        <p className="coffeeBalance">{pool ? balances.filter(value => (value.poolId == pool))[0].coffeeAmount / 1000 : "-"} kg</p>
+                        <p className="userBalance">{selectedBalance?.moneyAmount ?? 0} Ft</p>
+                        <p className="coffeeBalance">{(selectedBalance?.coffeeAmount ?? 0) / 1000} kg</p>
                     </div>
                 </SectionCard>
                 <SectionCard className="actionContainer">
