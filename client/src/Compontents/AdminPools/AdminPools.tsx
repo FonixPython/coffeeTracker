@@ -87,7 +87,7 @@ function AdminPoolCard({ pool, setModal, setModalOpened, reload }: AdminPoolCard
         e.preventDefault()
         const data = new FormData(e.currentTarget)
         const name = data.get("name")
-        const result = await fetch("/api/addPool", {
+        const result = await fetch("/api/editPool/" + pool.id, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -106,12 +106,12 @@ function AdminPoolCard({ pool, setModal, setModalOpened, reload }: AdminPoolCard
 
     function editPoolModal() {
         setModal({
-            title: "",
-            elemnets:
+            title: "Edit pool name",
+            elements:
                 <form action="" onSubmit={editPoolAction}>
-                    <input type="text" value={pool.name} />
+                    <input type="text" defaultValue={pool.name} name="name" />
                     <input type="submit" value="Change" />
-                    <input type="button" value="Cancel" onClick={() => {
+                    <input type="button" className="dangerButton" value="Cancel" onClick={() => {
                         setModalOpened(false)
                         setModal({ title: "", elements: <></> })
                     }} />
@@ -122,7 +122,7 @@ function AdminPoolCard({ pool, setModal, setModalOpened, reload }: AdminPoolCard
 
     return (
         <SectionCard key={pool.id} title={pool.name} collapseable={true} headerChildren={<>
-            <button className="actionButton">Edit <FontAwesomeIcon icon={faPenToSquare} /></button>
+            <button className="actionButton" onClick={editPoolModal}>Edit <FontAwesomeIcon icon={faPenToSquare} /></button>
             <button className="actionButton dangerButton" onClick={deletePoolModal}>Delete <FontAwesomeIcon icon={faTrash} /></button>
         </>}>
             <hr />
