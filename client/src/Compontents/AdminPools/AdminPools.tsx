@@ -83,6 +83,43 @@ function AdminPoolCard({ pool, setModal, setModalOpened, reload }: AdminPoolCard
         console.log("a")
     }
 
+    async function editPoolAction(e: React.SubmitEvent) {
+        e.preventDefault()
+        const data = new FormData(e.currentTarget)
+        const name = data.get("name")
+        const result = await fetch("/api/addPool", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ name })
+        })
+        if (result.ok) {
+            setModalOpened(false)
+            setModal({ title: "", elements: <></> })
+            reload()
+        } else {
+            const jsonResult = await result.json()
+            toast.error(jsonResult.message)
+        }
+    }
+
+    function editPoolModal() {
+        setModal({
+            title: "",
+            elemnets:
+                <form action="" onSubmit={editPoolAction}>
+                    <input type="text" value={pool.name} />
+                    <input type="submit" value="Change" />
+                    <input type="button" value="Cancel" onClick={() => {
+                        setModalOpened(false)
+                        setModal({ title: "", elements: <></> })
+                    }} />
+                </form>
+        })
+        setModalOpened(true)
+    }
+
     return (
         <SectionCard key={pool.id} title={pool.name} collapseable={true} headerChildren={<>
             <button className="actionButton">Edit <FontAwesomeIcon icon={faPenToSquare} /></button>
