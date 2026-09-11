@@ -7,7 +7,7 @@ import { useEffect, useState } from "react"
 import { Toaster, toast } from "sonner"
 import type { SubmitEvent } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPlus } from "@fortawesome/free-solid-svg-icons"
+import { faPenToSquare, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons"
 
 export function AdminPage() {
     const [modalOpened, setModalOpened] = useState<boolean>()
@@ -15,6 +15,8 @@ export function AdminPage() {
         title: "",
         elements: <></>,
     })
+
+    // Pools
 
     const [pools, setPools] = useState<Pool[]>()
 
@@ -65,19 +67,94 @@ export function AdminPage() {
         setModalOpened(true)
     }
 
-    function confirmationModal(confirmText: string) {
+    // Variations
+
+    interface Variation {
+        id: string,
+        coffeeAmount: number
+    }
+
+    const [variations, setVariations] = useState<Variation[]>()
+
+    async function loadVariations() {
+        const result = await fetch("/api/getVariations")
+        if (result.ok) {
+            const resultJson = await result.json()
+            setVariations(resultJson.result)
+        } else {
+            toast.error("Falied to load variations!")
+        }
+    }
+
+    async function createVariation(e: React.SubmitEvent) {
+        e.preventDefault()
+        const formData = new FormData(e.currentTarget)
+        const id = formData.get("id")
+        const coffeeAmount = Number(formData.get("coffeeAmount"))
+        const result = await fetch("/api/addVariation", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ id, coffeeAmount })
+        })
+        if (result.ok) {
+            setModalOpened(false)
+            setModal({ title: "", elements: <></> })
+            loadVariations()
+        } else {
+            const jsonResult = await result.json()
+            toast.error(jsonResult.message)
+        }
+    }
+
+    async function addVariationModal() {
         setModal({
-            title: "Confirmation",
+            title: "Add new variation",
+            elements:
+                <form action="" onSubmit={createVariation}>
+                    <input type="text" name="id" placeholder="Variation name..." required={true} />
+                    <input type="number" name="coffeeAmount" style={{ width: "100px" }} required={true} />g
+                    <input type="submit" value="Add" />
+                    <input type="button" className="dangerButton" onClick={() => {
+                        setModalOpened(false)
+                        setModal({ title: "", elements: <></> })
+                    }} value="Cancel" />
+                </form>
+        })
+        setModalOpened(true)
+    }
+
+    async function deleteVariation(id: string) {
+        const result = await fetch("/api/deleteVariation/" + id, { method: "DELETE" })
+        if (result.ok) {
+            loadVariations()
+            setModalOpened(false)
+            toast.success("Successfully deleted variation!")
+            setModal({ title: "", elements: <></> })
+        } else {
+            toast.error((await result.json()).message)
+        }
+    }
+
+    async function deleteVariationModal(id: string) {
+        setModal({
+            title: "Delete variation",
             elements:
                 <div>
-                    <button className="dangerButton">{confirmText || "Do it!"}</button>
-                    <button className="actionButton">Cancel</button>
+                    <button className="actionButton dangerButton" onClick={() => { deleteVariation(id) }}>Delete</button>
+                    <button className="actionButton" onClick={() => {
+                        setModalOpened(false)
+                        setModal({ title: "", elements: <></> })
+                    }}>Cancel</button>
                 </div>
         })
+        setModalOpened(true)
     }
 
     useEffect(() => {
         loadPools()
+        loadVariations()
     }, [])
 
     return (
@@ -93,8 +170,19 @@ export function AdminPage() {
                     <hr />
                     <AdminPools pools={pools || []} setModal={setModal} setModalOpened={setModalOpened} reload={loadPools} />
                 </SectionCard>
-                <SectionCard title="Variations" collapseable>
-                    <button>Add variation</button>
+                <SectionCard title="Variations" collapseable headerChildren={
+                    <button onClick={addVariationModal}>Add variation<FontAwesomeIcon icon={faPlus} /></button>
+                }>
+                    <hr />
+                    {variations?.map((variation) => (
+                        <div className="variationCard">
+                            <p>{variation.id} | {variation.coffeeAmount}g/serving</p>
+                            <div>
+                                <button className="actionButton">Edit<FontAwesomeIcon icon={faPenToSquare} /></button>
+                                <button className="actionButton dangerButton" onClick={() => { deleteVariationModal(variation.id) }}>Delete<FontAwesomeIcon icon={faTrash} /></button>
+                            </div>
+                        </div>
+                    ))}
                 </SectionCard>
                 <SectionCard title="Users" collapseable>
                     <button>Register User</button>

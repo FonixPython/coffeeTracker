@@ -79,10 +79,10 @@ export async function deletePool(req: Request, res: Response) {
 
 export async function addVariation(req: Request, res: Response) {
     try {
-        if (!req.body.name || !req.body.coffeeAmount) {
+        if (!req.body.id || !req.body.coffeeAmount) {
             return res.json({ message: "Invalid request!" }).status(400)
         }
-        const result = await prisma.coffeeVariation.create({ data: { id: req.body.name, coffeeAmount: req.body.coffeeAmount } })
+        const result = await prisma.coffeeVariation.create({ data: { id: req.body.id, coffeeAmount: req.body.coffeeAmount } })
         if (!result) {
             return res.json({ message: "Internal server error!" }).status(500)
         }
@@ -134,10 +134,11 @@ export async function editVariation(req: Request, res: Response) {
 
 export async function deleteVariation(req: Request, res: Response) {
     try {
-        if (!req.body.name) {
+        if (!req.params.variationId) {
             return res.json({ message: "No pool name in request!" }).status(400)
         }
-        const result = await prisma.coffeeVariation.delete({ where: { id: req.body.name } })
+        const variationId = Array.isArray(req.params.variationId) ? req.params.variationId[0] : req.params.variationId;
+        const result = await prisma.coffeeVariation.delete({ where: { id: variationId } })
         if (!result) {
             return res.json({ message: "Internal server error!" }).status(500)
         }

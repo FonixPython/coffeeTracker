@@ -41,4 +41,4 @@ router.delete("/api/deletePool/:poolId", authenticateAdmin, deletePool)
 
 router.post("/api/addVariation", authenticateAdmin, addVariation)
 router.post("/api/editVariation", authenticateAdmin, editVariation)
-router.delete("/api/deleteVariation", authenticateAdmin, deleteVariation)
+router.delete("/api/deleteVariation/:variationId", authenticateAdmin, deleteVariation)
