@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Toaster, toast } from "sonner"
 import "./Login.css"
 
@@ -14,11 +14,11 @@ export function LoginPage({ permission }: LoginPageProps) {
         username: "",
         password: ""
     })
-    const handleChange = (e) => {
-        const { name, value } = e.target
+    const handleChange = (e: React.ChangeEvent) => {
+        const { name, value } = e.currentTarget
         setCredentials(prev => ({ ...prev, [name]: value }))
     }
-    async function login(e) {
+    async function login(e: React.SubmitEvent) {
         e.preventDefault()
         if (mode == "login") {
             const result = await fetch("/api/login", {

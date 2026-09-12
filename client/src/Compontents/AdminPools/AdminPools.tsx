@@ -4,7 +4,7 @@ import { faPenToSquare, faTrash, faMoneyBillWave, faCoffee } from "@fortawesome/
 import { toast } from "sonner"
 import "./AdminPools.css"
 
-interface Transaction {
+export interface Transaction {
     id: string,
     userId: string,
     poolId: string,
@@ -85,7 +85,7 @@ function AdminPoolCard({ pool, setModal, setModalOpened, reload }: AdminPoolCard
 
     async function editPoolAction(e: React.SubmitEvent) {
         e.preventDefault()
-        const data = new FormData(e.currentTarget)
+        const data = new FormData(e.target)
         const name = data.get("name")
         const result = await fetch("/api/editPool/" + pool.id, {
             method: "POST",
@@ -133,7 +133,7 @@ function AdminPoolCard({ pool, setModal, setModalOpened, reload }: AdminPoolCard
     )
 }
 
-function AdminTransactionCard({ transaction, setModal, setModalOpened, reload }: AdminTransactionCardProps) {
+export function AdminTransactionCard({ transaction, setModal, setModalOpened, reload }: AdminTransactionCardProps) {
     let color = ""
     let text = ""
     switch (transaction.type) {

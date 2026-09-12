@@ -8,6 +8,7 @@ import { Toaster, toast } from "sonner"
 import type { SubmitEvent } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPenToSquare, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons"
+import { AdminUsers, type User } from "../../Compontents/AdminUsers/AdminUsers"
 
 export function AdminPage() {
     const [modalOpened, setModalOpened] = useState<boolean>()
@@ -88,7 +89,7 @@ export function AdminPage() {
 
     async function createVariation(e: React.SubmitEvent) {
         e.preventDefault()
-        const formData = new FormData(e.currentTarget)
+        const formData = new FormData(e.target)
         const id = formData.get("id")
         const coffeeAmount = Number(formData.get("coffeeAmount"))
         const result = await fetch("/api/addVariation", {
@@ -127,7 +128,7 @@ export function AdminPage() {
 
     async function editVariation(e: React.SubmitEvent, old: string) {
         e.preventDefault()
-        const formData = new FormData(e.currentTarget)
+        const formData = new FormData(e.target)
         const id = formData.get("id")
         const coffeeAmount = Number(formData.get("coffeeAmount"))
         const result = await fetch("/api/editVariation", {
@@ -191,9 +192,24 @@ export function AdminPage() {
         setModalOpened(true)
     }
 
+    // Users
+
+    const [users, setUsers] = useState<User[]>([])
+
+    async function loadUsers() {
+        const result = await fetch("/api/getAllUsers")
+        if (result.ok) {
+            const resultJson = await result.json()
+            setUsers(resultJson.result)
+        } else {
+            toast.error("Falied to load users!")
+        }
+    }
+
     useEffect(() => {
         loadPools()
         loadVariations()
+        loadUsers()
     }, [])
 
     return (
@@ -223,8 +239,11 @@ export function AdminPage() {
                         </div>
                     ))}
                 </SectionCard>
-                <SectionCard title="Users" collapseable>
-                    <button>Register User</button>
+                <SectionCard title="Users" collapseable headerChildren={
+                    <button>Register User<FontAwesomeIcon icon={faPlus} /></button>
+                }>
+                    <hr />
+                    <AdminUsers users={users} setModal={setModal} setModalOpened={setModalOpened} reload={loadUsers} />
                 </SectionCard>
             </main>
         </>

@@ -5,7 +5,7 @@ import { calculateCoffeeCost } from "./userActionController.js";
 
 export async function getAllUsers(req: Request, res: Response) {
     try {
-        const result = await prisma.user.findMany()
+        const result = await prisma.user.findMany({ include: { transactions: true }, omit: { passwordHash: true } })
         return res.json({ message: "Successfully retrieved users!", result: result })
     } catch (e) {
         console.log()
