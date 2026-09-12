@@ -125,6 +125,45 @@ export function AdminPage() {
         setModalOpened(true)
     }
 
+    async function editVariation(e: React.SubmitEvent, old: string) {
+        e.preventDefault()
+        const formData = new FormData(e.currentTarget)
+        const id = formData.get("id")
+        const coffeeAmount = Number(formData.get("coffeeAmount"))
+        const result = await fetch("/api/editVariation", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ id: old, name: id, coffeeAmount })
+        })
+        if (result.ok) {
+            setModalOpened(false)
+            setModal({ title: "", elements: <></> })
+            loadVariations()
+        } else {
+            const jsonResult = await result.json()
+            toast.error(jsonResult.message)
+        }
+    }
+
+    async function editVariationModal(id: string, coffeeAmount: number) {
+        setModal({
+            title: "Edit variation",
+            elements:
+                <form action="" onSubmit={(e) => { editVariation(e, id) }}>
+                    <input type="text" name="id" placeholder="Variation name..." required={true} defaultValue={id} />
+                    <input type="number" name="coffeeAmount" style={{ width: "100px" }} required={true} defaultValue={coffeeAmount} />g
+                    <input type="submit" value="Save" />
+                    <input type="button" className="dangerButton" onClick={() => {
+                        setModalOpened(false)
+                        setModal({ title: "", elements: <></> })
+                    }} value="Cancel" />
+                </form>
+        })
+        setModalOpened(true)
+    }
+
     async function deleteVariation(id: string) {
         const result = await fetch("/api/deleteVariation/" + id, { method: "DELETE" })
         if (result.ok) {
@@ -159,7 +198,7 @@ export function AdminPage() {
 
     return (
         <>
-            <Toaster />
+            <Toaster theme="system" />
             <ModalWrapper isopen={modalOpened} setOpen={setModalOpened} title={modal.title}>
                 {modal.elements}
             </ModalWrapper>
@@ -178,7 +217,7 @@ export function AdminPage() {
                         <div className="variationCard">
                             <p>{variation.id} | {variation.coffeeAmount}g/serving</p>
                             <div>
-                                <button className="actionButton">Edit<FontAwesomeIcon icon={faPenToSquare} /></button>
+                                <button className="actionButton" onClick={() => { editVariationModal(variation.id, variation.coffeeAmount) }}>Edit<FontAwesomeIcon icon={faPenToSquare} /></button>
                                 <button className="actionButton dangerButton" onClick={() => { deleteVariationModal(variation.id) }}>Delete<FontAwesomeIcon icon={faTrash} /></button>
                             </div>
                         </div>

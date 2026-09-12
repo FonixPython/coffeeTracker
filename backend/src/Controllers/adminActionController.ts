@@ -121,7 +121,7 @@ export async function editVariation(req: Request, res: Response) {
                 })
             )
         )
-        const result = await prisma.coffeeVariation.create({ data: { id: req.body.id, coffeeAmount: req.body.coffeeAmount } })
+        const result = await prisma.coffeeVariation.update({ where: { id: req.body.id }, data: { id: req.body.name, coffeeAmount: req.body.coffeeAmount } })
         if (!result) {
             return res.json({ message: "Internal server error!" }).status(500)
         }
