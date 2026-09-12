@@ -206,6 +206,56 @@ export function AdminPage() {
         }
     }
 
+    async function addUserAction(e: React.SubmitEvent) {
+        e.preventDefault()
+        const formData = new FormData(e.target)
+        const username = formData.get("username")
+        const password = formData.get("password")
+        const admin = Boolean(formData.get("admin"))
+
+        const result = await fetch("/api/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ username, password, admin })
+        })
+        if (result.ok) {
+            setModalOpened(false)
+            setModal({ title: "", elements: <></> })
+            loadUsers()
+        } else {
+            const jsonResult = await result.json()
+            toast.error(jsonResult.message)
+        }
+    }
+
+    async function addUserModal() {
+        setModal({
+            title: "Add new user",
+            elements:
+                <form action="" className="newUserForm" onSubmit={addUserAction}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
+                        Username: <input type="username" name="username" placeholder="Username" />
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
+                        Password: <input type="password" name="password" placeholder="Password" />
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", margin: "5px" }}>
+                        Admin: <input type="checkbox" name="admin" defaultChecked={false} />
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
+                        <input type="submit" value="Register" style={{ width: "100%", margin: "3px" }} />
+                        <input type="button" className="dangerButton" style={{ width: "100%", margin: "3px" }} onClick={() => {
+                            setModalOpened(false)
+                            setModal({ title: "", elements: <></> })
+                        }} value="Cancel" />
+                    </div>
+                </form>
+        })
+        setModalOpened(true)
+    }
+
     useEffect(() => {
         loadPools()
         loadVariations()
@@ -240,7 +290,7 @@ export function AdminPage() {
                     ))}
                 </SectionCard>
                 <SectionCard title="Users" collapseable headerChildren={
-                    <button>Register User<FontAwesomeIcon icon={faPlus} /></button>
+                    <button onClick={addUserModal}>Register User<FontAwesomeIcon icon={faPlus} /></button>
                 }>
                     <hr />
                     <AdminUsers users={users} setModal={setModal} setModalOpened={setModalOpened} reload={loadUsers} />

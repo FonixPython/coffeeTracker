@@ -13,6 +13,25 @@ export async function getAllUsers(req: Request, res: Response) {
     }
 }
 
+export async function deleteSpecifiedUser(req: Request & Record<string, any>, res: Response) {
+    try {
+        if (!req.params.userId) {
+            return res.status(400).json({ message: "Invalid request!" })
+        }
+        const userId = Array.isArray(req.params.userId) ? req.params.userId[0] : req.params.userId
+        const result = await prisma.user.delete({
+            where: { id: userId }
+        })
+        if (!result) {
+            return res.status(500).json({ message: "Failed to delete user!" })
+        }
+        return res.json({ message: "Sucessfully deleted user!" })
+    } catch (e) {
+        console.log(e)
+        return res.status(500).json({ message: "Internal server error!" })
+    }
+}
+
 // Pool CRUD
 
 export async function getPools(req: Request, res: Response) {

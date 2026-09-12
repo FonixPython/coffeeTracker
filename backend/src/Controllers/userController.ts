@@ -53,6 +53,7 @@ export async function register(req: Request, res: Response) {
                     data: {
                         username: username,
                         passwordHash: await bcrypt.hash(password, 10),
+                        admin: Boolean(req.body.admin),
                         accepted: true,
                         pfpId: null
                     }
@@ -137,6 +138,7 @@ export async function deleteUser(req: Request & Record<string, any>, res: Respon
         if (!result) {
             return res.status(500).json({ message: "Failed to delete user!" })
         }
+        return res.json({ message: "Sucessfully deleted user!" })
     } catch (e) {
         console.log(e)
         return res.status(500).json({ message: "Internal server error!" })

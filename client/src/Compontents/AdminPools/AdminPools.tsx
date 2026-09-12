@@ -80,7 +80,6 @@ function AdminPoolCard({ pool, setModal, setModalOpened, reload }: AdminPoolCard
                 </div>
         })
         setModalOpened(true)
-        console.log("a")
     }
 
     async function editPoolAction(e: React.SubmitEvent) {
