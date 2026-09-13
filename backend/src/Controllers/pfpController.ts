@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
 
 export const uploadMiddleware = (req: Request & Record<string, any>, res: Response, next: NextFunction) => {
     const limits = {} as { [key: string]: any };
-    limits.fileSize = 1024 * 10;
+    limits.fileSize = 1024 * 1024 * 10;
     const allowedMime: string[] = ["image/jpeg", "image/png", "image/heic", "image/heif", "image/bmp", "image/avif", "image/gif", "image/webp"]
 
     const upload = multer({
@@ -78,11 +78,10 @@ export async function deleteProfilePictre(req: Request & Record<string, any>, re
         return res.status(401).json({ message: "Unauthorized to delete the profile picture!" })
     }
     try {
-        fs.unlink(filePath)
+        await fs.unlink(filePath)
         return res.json({ message: "Successfully deleted profile picture!" })
     } catch (e) {
-        console.log(e)
-        return res.status(500).json({ message: "Internal server error!" })
+        return res.status(404).json({ message: "Profile picture is already the default!" })
     }
 }
 
@@ -96,7 +95,6 @@ export async function getProfilePicture(req: Request & Record<string, any>, res:
         await fs.stat(filePath);
         return res.sendFile(filePath);
     } catch (err: any) {
-        console.log(err)
         return res.sendFile(path.resolve("dist", "public", "defaultProfile.webp"));
     }
 }
