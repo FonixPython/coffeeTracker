@@ -45,3 +45,15 @@ input:focus {
 input:active[type="submit"] {
     scale: 1.15;
 }
+
+button {
+    margin: 5px 5px;
+    background-color: var(--bg-light);
+    border: 2px solid var(--border);
+    padding: 5px;
+    border-radius: 10px;
+    color: var(--text);
+    text-align: center;
+    font-size: 1rem;
+    display: inline-block;
+}

@@ -194,11 +194,23 @@ export async function changePassword(req: Request & Record<string, any>, res: Re
     try {
         const oldPassword = req.body.oldPassword
         const newPassword = req.body.newPassword
-        if (!oldPassword || !newPassword) {
+        if (!newPassword) {
             return res.status(401).json({ message: "Invalid request!" })
         }
-        const currentUser = await prisma.user.findFirstOrThrow({ where: { id: req.user.id } })
-        if (await bcrypt.compare(oldPassword, currentUser.passwordHash) || req.user.permission == "admin") {
+        if (req.user.permission == "admin" && req.body.id) {
+            const result = await prisma.user.update({
+                where: { id: req.body.id }, data: {
+                    passwordHash: await bcrypt.hash(newPassword, 10)
+                }
+            })
+            if (!result) {
+                return res.status(500).json({ message: "Internal server error!" })
+            }
+            return res.status(200).json({ message: "Successfully changed password!" })
+        } else if (await bcrypt.compare(oldPassword, req.user.passwordHash)) {
+            if (!oldPassword) {
+                return res.status(401).json({ message: "Invalid request! Old password needed!" })
+            }
             const result = await prisma.user.update({
                 where: { id: req.user.id }, data: {
                     passwordHash: await bcrypt.hash(newPassword, 10)

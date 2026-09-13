@@ -30,21 +30,24 @@
     margin: 5px;
 }
 
-.modalWrapper .titleBar button {
+.modalWrapper .titleBar .closeButton {
     height: 30px;
     width: 30px;
     background-color: var(--bg-light);
     border: 2px solid var(--border);
     border-radius: 10px;
     transition: 0.1s ease-in;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.modalWrapper .titleBar button:hover {
+.modalWrapper .titleBar .closeButton:hover {
     scale: 1.15;
     background-color: var(--highlight);
 }
 
-.modalWrapper .titleBar button:active {
+.modalWrapper .titleBar .closeButton:active {
     background-color: var(--secondary);
 }
 

@@ -14,7 +14,7 @@ export function ModalWrapper(props) {
                 <div className="modalWrapper" onClick={() => { }}>
                     <div className="titleBar">
                         <p>{props.title || ""}</p>
-                        <button onClick={() => { props.setOpen(false) }}><FontAwesomeIcon icon={faXmark} /></button>
+                        <button className="closeButton" onClick={() => { props.setOpen(false) }}><FontAwesomeIcon icon={faXmark} /></button>
                     </div>
                     <hr />
                     <div className="contentWrapper">
