@@ -54,8 +54,7 @@ export async function register(req: Request, res: Response) {
                         username: username,
                         passwordHash: await bcrypt.hash(password, 10),
                         admin: Boolean(req.body.admin),
-                        accepted: true,
-                        pfpId: null
+                        accepted: true
                     }
                 })
                 return res.status(200).json({ message: "User successfully created!" })
@@ -66,8 +65,7 @@ export async function register(req: Request, res: Response) {
                         username: username,
                         passwordHash: await bcrypt.hash(password, 10),
                         accepted: users.length == 0 ? true : false,
-                        admin: users.length == 0 ? true : false,
-                        pfpId: null
+                        admin: users.length == 0 ? true : false
                     }
                 })
                 if (!creationResult) {
@@ -91,8 +89,7 @@ export async function register(req: Request, res: Response) {
                     username: username,
                     passwordHash: await bcrypt.hash(password, 10),
                     accepted: users.length == 0 ? true : false,
-                    admin: users.length == 0 ? true : false,
-                    pfpId: null
+                    admin: users.length == 0 ? true : false
                 }
             })
             if (!creationResult) {
@@ -166,7 +163,6 @@ export async function editUser(req: Request & Record<string, any>, res: Response
                 where: { id: req.body.id }, data: {
                     username: req.body.username,
                     accepted: req.body.accepted,
-                    pfpId: req.body.pfpId,
                     admin: req.body.admin
                 }
             })
@@ -175,7 +171,6 @@ export async function editUser(req: Request & Record<string, any>, res: Response
                 where: { id: req.user.id }, data: {
                     username: req.body.username,
                     accepted: req.body.accepted,
-                    pfpId: req.body.pfpId,
                     admin: req.body.admin
                 }
             })

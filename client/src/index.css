@@ -57,3 +57,23 @@ button {
     font-size: 1rem;
     display: inline-block;
 }
+
+.profilePicture {
+    height: 50px;
+    width: 50px;
+    border-radius: 100%;
+    margin: 5px;
+    object-fit: cover;
+    overflow: hidden;
+}
+
+.profilePictureSelector {
+    height: 150px;
+    width: 150px;
+    transition: 0.1s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.profilePictureSelector:hover {
+    scale: 1.03;
+    filter: drop-shadow(var(--secondary) 0 0 10px)
+}

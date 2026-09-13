@@ -8,7 +8,6 @@ export interface UserObject {
     id: string,
     username: string,
     accepted: boolean,
-    pfpId: string | null,
     permission: PermissionLevel,
     dateOfRegistration: Date
 }
@@ -40,7 +39,6 @@ export async function validateUserToken(token: string, validateTo: PermissionLev
                 id: tokenResult.userId,
                 username: tokenResult.user.username,
                 accepted: true,
-                pfpId: tokenResult.user.pfpId,
                 permission: permission,
                 dateOfRegistration: tokenResult.dateOfLogin
             },

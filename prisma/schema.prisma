@@ -11,13 +11,10 @@ model User {
   username           String        @unique
   passwordHash       String
   accepted           Boolean       @default(false)
-  pfpId              String?
   admin              Boolean       @default(false)
   dateOfRegistration DateTime      @default(now())
-  images             Image[]       @relation("UserUploadedImages")
   tokens             Token[]
   transactions       Transaction[]
-  image              Image?        @relation("UserProfilePicture", fields: [pfpId], references: [id])
 }
 
 model Token {
@@ -38,15 +35,6 @@ model Pool {
 model Setting {
   key  String @id
   data String
-}
-
-model Image {
-  id             String   @id @default(uuid())
-  userId         String
-  storedFilename String
-  dateOfUpload   DateTime @default(now())
-  user           User     @relation("UserUploadedImages", fields: [userId], references: [id])
-  users          User[]   @relation("UserProfilePicture")
 }
 
 model Transaction {

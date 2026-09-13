@@ -4,6 +4,7 @@ import { login, register, logout, checkAuth, deleteUser, editUser, changePasswor
 import { addTransaction, deleteTransaction, editTransaction, getBalances, getCoffeeVariations, getTransactions } from './Controllers/userActionController.js';
 import { authenticateAdmin, authenticateUser } from './auth.js';
 import { addPool, addVariation, deletePool, deleteSpecifiedUser, deleteVariation, editPool, editVariation, getAllUsers, getPools } from './Controllers/adminActionController.js';
+import { deleteProfilePictre, getProfilePicture, uploadMiddleware, uploadProfilePicture } from './Controllers/pfpController.js';
 
 export const router = express.Router();
 
@@ -29,6 +30,12 @@ router.get("/api/getVariations", authenticateUser, getCoffeeVariations)
 router.post("/api/addTranaction", authenticateUser, addTransaction)
 router.post("/api/editTransaction/:transactionId", authenticateUser, editTransaction)
 router.delete("/api/deleteTransaction/:transactionId", authenticateUser, deleteTransaction)
+
+// Profile picture actions
+
+router.get("/api/getProfilePicture/:userId", authenticateUser, getProfilePicture)
+router.delete("/api/deleteProfilePicture/:userId", authenticateUser, deleteProfilePictre)
+router.post("/api/uploadProfilePicture", authenticateUser, uploadMiddleware, uploadProfilePicture)
 
 // Actions for admin
 router.get("/api/getAllUsers", authenticateAdmin, getAllUsers)
