@@ -18,7 +18,7 @@ router.post("/api/register", register)
 router.get("/api/logout", authenticateUser, logout)
 router.delete("/api/deleteUser", authenticateUser, deleteUser)
 router.post("/api/changePassword", authenticateUser, changePassword)
-router.get("/api/editUser", authenticateUser, editUser)
+router.post("/api/editUser", authenticateUser, editUser)
 router.get("/api/verify", authenticateUser, checkAuth)
 
 // Actions for users

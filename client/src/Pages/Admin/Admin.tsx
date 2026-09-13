@@ -255,7 +255,7 @@ export function AdminPage() {
         })
         setModalOpened(true)
     }
-
+    
     useEffect(() => {
         loadPools()
         loadVariations()

@@ -67,11 +67,28 @@ function AdminUserCard({ user, setModalOpened, setModal, reload }: UserProps) {
         setModalOpened(true)
     }
 
+    async function acceptUser() {
+        const result = await fetch("/api/editUser/", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: user.id, username: user.username, accepted: true, pfpId: user.pfpId, admin: user.admin })
+        })
+        if (result.ok) {
+            reload()
+            setModalOpened(false)
+            toast.success("User " + user.username + " accepted!")
+            setModal({ title: "", elements: <></> })
+        } else {
+            toast.error((await result.json()).message)
+        }
+    }
 
     return (
         <SectionCard title={user.username} collapseable={true} headerChildren={
             <>
-                {!user.accepted && <button className="actionButton dangerButton" style={{ borderColor: "var(--success)" }}>Accept<FontAwesomeIcon icon={faCheckDouble} /></button>}
+                {!user.accepted && <button className="actionButton dangerButton" style={{ borderColor: "var(--success)" }} onClick={acceptUser}>Accept<FontAwesomeIcon icon={faCheckDouble} /></button>}
                 <button className="actionButton">Edit <FontAwesomeIcon icon={faPenToSquare} /></button>
                 <button className="actionButton dangerButton" onClick={deleteUserModal}>Delete <FontAwesomeIcon icon={faTrash} /></button>
             </>

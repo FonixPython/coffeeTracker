@@ -156,7 +156,8 @@ export async function checkAuth(req: Request & Record<string, any>, res: Respons
 
 export async function editUser(req: Request & Record<string, any>, res: Response) {
     try {
-        if (!req.body.username || !req.body.accepted || !req.body.pfpId || !req.body.admin) {
+        if (!req.body.username) {
+            console.log(req.body)
             return res.status(400).json({ message: "Invalid request, must contain all user properties!" })
         }
         let result
