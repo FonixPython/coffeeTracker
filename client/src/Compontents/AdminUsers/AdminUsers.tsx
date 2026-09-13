@@ -90,7 +90,25 @@ function AdminUserCard({ user, setModalOpened, setModal, reload }: UserProps) {
         const [chPw, setChPw] = useState(false)
         async function editUserAction(e: React.SubmitEvent) {
             e.preventDefault()
-
+            const data = new FormData(e.target)
+            const username = data.get("username")
+            const admin = Boolean(data.get("admin"))
+            const accepted = Boolean(data.get("accepted"))
+            const result = await fetch("/api/editUser/", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: user.id, username, accepted, pfpId: user.pfpId, admin })
+            })
+            if (result.ok) {
+                reload()
+                setModalOpened(false)
+                toast.success("User " + user.username + " edited successfully!")
+                setModal({ title: "", elements: <></> })
+            } else {
+                toast.error((await result.json()).message)
+            }
         }
 
         async function changeUserPassword(e: React.MouseEvent) {
