@@ -173,3 +173,5 @@ database.db
 prisma/migrations
 
 .vscode
+
+pfpUploads
