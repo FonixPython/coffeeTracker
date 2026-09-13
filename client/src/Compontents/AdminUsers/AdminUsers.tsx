@@ -10,7 +10,6 @@ export interface User {
     id: string,
     username: string,
     accepted: boolean,
-    pfpId: string,
     admin: boolean,
     dateOfRegistration: string,
     transactions: Transaction[]
@@ -74,7 +73,7 @@ function AdminUserCard({ user, setModalOpened, setModal, reload }: UserProps) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ id: user.id, username: user.username, accepted: true, pfpId: user.pfpId, admin: user.admin })
+            body: JSON.stringify({ id: user.id, username: user.username, accepted: true, admin: user.admin })
         })
         if (result.ok) {
             reload()
@@ -99,7 +98,7 @@ function AdminUserCard({ user, setModalOpened, setModal, reload }: UserProps) {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ id: user.id, username, accepted, pfpId: user.pfpId, admin })
+                body: JSON.stringify({ id: user.id, username, accepted, admin })
             })
             if (result.ok) {
                 reload()
