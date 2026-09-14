@@ -5,7 +5,7 @@ import { faCoffee, faMoneyBillWave } from "@fortawesome/free-solid-svg-icons"
 import { SectionCard } from "../../Compontents/SectionCard/SectionCard"
 import { HistoryCard } from "../../Compontents/HistoryCard/HistoryCard"
 import { BalanceCard } from "../../Compontents/BalanceCard/BalanceCard"
-import { use, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
 import { TopBar } from "../../Compontents/TopBar/TopBar"
 import type { User } from "../../Compontents/AdminUsers/AdminUsers"
@@ -13,7 +13,7 @@ import type { User } from "../../Compontents/AdminUsers/AdminUsers"
 export function HomePage() {
     const [searchParams, setSearchParams] = useSearchParams()
     const [currWidth, setCurrWidth] = useState(window.innerWidth)
-    const handleResize = (e) => {
+    const handleResize = (w: Window, e: React.UIEvent) => {
         setCurrWidth(window.innerWidth)
     }
 
@@ -21,8 +21,16 @@ export function HomePage() {
         window.addEventListener("resize", handleResize)
         return () => window.removeEventListener("resize", handleResize)
     })
+
+    interface Balance {
+        poolId: string,
+        poolName: string,
+        coffeeAmount: number | null,
+        moneyAmount: number | null
+    }
+
     const [user, setUser] = useState<User | null>(null)
-    const [balances, setBalances] = useState([])
+    const [balances, setBalances] = useState<Balance[]>([])
     const [transactions, setTransactions] = useState([])
     const [variations, setVariations] = useState([])
     const [pool, setPool] = useState<string | null>(searchParams.get("pool") || null)
@@ -89,7 +97,7 @@ export function HomePage() {
         getPoolTransactions()
     }, [pool])
 
-    async function handleActionButton(e) {
+    async function handleActionButton(e: React.MouseEvent) {
         if (!pool) {
             toast.error("No pool selected!")
         }
