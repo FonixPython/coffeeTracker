@@ -10,7 +10,8 @@ export interface User {
     id: string,
     username: string,
     accepted: boolean,
-    admin: boolean,
+    admin?: boolean,
+    permission?: "none" | "user" | "admin",
     dateOfRegistration: string,
     transactions: Transaction[]
 }

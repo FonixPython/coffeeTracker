@@ -5,8 +5,10 @@ import { faCoffee, faMoneyBillWave } from "@fortawesome/free-solid-svg-icons"
 import { SectionCard } from "../../Compontents/SectionCard/SectionCard"
 import { HistoryCard } from "../../Compontents/HistoryCard/HistoryCard"
 import { BalanceCard } from "../../Compontents/BalanceCard/BalanceCard"
-import { useEffect, useState } from "react"
+import { use, useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
+import { TopBar } from "../../Compontents/TopBar/TopBar"
+import type { User } from "../../Compontents/AdminUsers/AdminUsers"
 
 export function HomePage() {
     const [searchParams, setSearchParams] = useSearchParams()
@@ -19,14 +21,17 @@ export function HomePage() {
         window.addEventListener("resize", handleResize)
         return () => window.removeEventListener("resize", handleResize)
     })
+    const [user, setUser] = useState<User | null>(null)
     const [balances, setBalances] = useState([])
     const [transactions, setTransactions] = useState([])
     const [variations, setVariations] = useState([])
     const [pool, setPool] = useState<string | null>(searchParams.get("pool") || null)
-    const [uiEnabled, setUiEnabled] = useState(false)
 
     async function loadUserData() {
         try {
+            const user = await fetch("/api/verify")
+            const userJson = await user.json()
+            setUser(userJson.user)
             const balancesResult = await fetch("/api/getBalances")
             if (balancesResult.ok) {
                 const balancesJsonResult = await balancesResult.json()
@@ -97,6 +102,7 @@ export function HomePage() {
     return (
         <>
             <Toaster theme="system" />
+            <TopBar user={user} />
             <main className="homePage">
                 <SectionCard>
                     <div style={{ margin: 10 }} className="topCard">

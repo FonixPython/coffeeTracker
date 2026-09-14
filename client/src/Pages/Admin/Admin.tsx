@@ -9,6 +9,7 @@ import type { SubmitEvent } from "react"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPenToSquare, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons"
 import { AdminUsers, type User } from "../../Compontents/AdminUsers/AdminUsers"
+import { TopBar } from "../../Compontents/TopBar/TopBar"
 
 export function AdminPage() {
     const [modalOpened, setModalOpened] = useState<boolean>()
@@ -17,6 +18,12 @@ export function AdminPage() {
         elements: <></>,
     })
 
+    const [user, setUser] = useState<User | null>(null)
+    async function loadUser() {
+        const user = await fetch("/api/verify")
+        const userJson = await user.json()
+        setUser(userJson.user)
+    }
     // Pools
 
     const [pools, setPools] = useState<Pool[]>()
@@ -255,12 +262,16 @@ export function AdminPage() {
         })
         setModalOpened(true)
     }
-    
+
     useEffect(() => {
         loadPools()
         loadVariations()
         loadUsers()
     }, [])
+
+    useEffect(() => {
+        loadUser()
+    }, users)
 
     return (
         <>
@@ -268,6 +279,7 @@ export function AdminPage() {
             <ModalWrapper isopen={modalOpened} setOpen={setModalOpened} title={modal.title}>
                 {modal.elements}
             </ModalWrapper>
+            <TopBar user={user} />
             <main className="adminPage">
                 <SectionCard title="Pools" collapseable headerChildren={
                     <button onClick={addPoolModal}>Add Pool <FontAwesomeIcon icon={faPlus} /></button>

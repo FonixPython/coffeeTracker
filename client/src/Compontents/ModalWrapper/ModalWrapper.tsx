@@ -3,22 +3,28 @@ import "./ModalWrapper.css"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faXmark } from "@fortawesome/free-solid-svg-icons"
 
-export function ModalWrapper(props) {
-    if (props.isopen) {
+interface ModalWrapperProps extends React.PropsWithChildren {
+    title: string,
+    isopen: boolean,
+    setOpen: Function
+}
+
+export function ModalWrapper({ title, isopen, setOpen, children }: ModalWrapperProps) {
+    if (isopen) {
         return (
             <div className="screenCover" onClick={(e) => {
                 if (e.target === e.currentTarget) {
-                    props.setOpen(false)
+                    setOpen(false)
                 }
             }}>
                 <div className="modalWrapper" onClick={() => { }}>
                     <div className="titleBar">
-                        <p>{props.title || ""}</p>
-                        <button className="closeButton" onClick={() => { props.setOpen(false) }}><FontAwesomeIcon icon={faXmark} /></button>
+                        <p>{title || ""}</p>
+                        <button className="closeButton" onClick={() => { setOpen(false) }}><FontAwesomeIcon icon={faXmark} /></button>
                     </div>
                     <hr />
                     <div className="contentWrapper">
-                        {props.children}
+                        {children}
                     </div>
                 </div>
             </div>
