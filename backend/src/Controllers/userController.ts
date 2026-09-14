@@ -2,7 +2,6 @@ import { Request, Response } from "express"
 import { extractToken, generateSession, loginUser, validateUserToken } from "../auth.js"
 import { prisma } from "../db.js";
 import bcrypt from "bcrypt"
-import { measureMemory } from "vm";
 
 export async function login(req: Request, res: Response) {
     try {
@@ -120,7 +119,6 @@ export async function logout(req: Request, res: Response) {
         }
         await prisma.token.delete({ where: { id: token } })
         return res.status(200).json({ message: "Successfully logged out!" })
-
     } catch (e) {
         console.log(e)
         return res.status(500).json({ message: "Internal server error!" })
@@ -169,9 +167,7 @@ export async function editUser(req: Request & Record<string, any>, res: Response
         } else {
             result = await prisma.user.update({
                 where: { id: req.user.id }, data: {
-                    username: req.body.username,
-                    accepted: req.body.accepted,
-                    admin: req.body.admin
+                    username: req.body.username
                 }
             })
         }

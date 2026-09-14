@@ -45,7 +45,6 @@ export async function validateUserToken(token: string, validateTo: PermissionLev
             met: validateTo != null ? (validateTo === permission || permission === "admin") : false
         }
     } catch (e) {
-        console.log(e)
         return { user: null, met: false }
     }
 }

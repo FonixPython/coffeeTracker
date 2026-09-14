@@ -279,7 +279,7 @@ export function AdminPage() {
             <ModalWrapper isopen={modalOpened} setOpen={setModalOpened} title={modal.title}>
                 {modal.elements}
             </ModalWrapper>
-            <TopBar user={user} />
+            <TopBar user={user} setModal={setModal} setModalOpened={setModalOpened} reload={loadUser} />
             <main className="adminPage">
                 <SectionCard title="Pools" collapseable headerChildren={
                     <button onClick={addPoolModal}>Add Pool <FontAwesomeIcon icon={faPlus} /></button>

@@ -30,7 +30,7 @@ export function LoginPage({ permission }: LoginPageProps) {
             })
             switch (result.status) {
                 case 200:
-                    navigate("/")
+                    document.location.reload()
                     break
                 case 403:
                     toast.error("Your account is not approved! Please wait for approval from an administrator!")

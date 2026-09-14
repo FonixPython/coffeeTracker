@@ -27,7 +27,8 @@ interface UserProps {
     user: User,
     setModalOpened: Function,
     setModal: Function,
-    reload: Function
+    reload: Function,
+    adminPanel?: boolean
 }
 
 export function AdminUsers({ users, setModalOpened, setModal, reload }: AdminUsersProps) {
@@ -40,7 +41,7 @@ export function AdminUsers({ users, setModalOpened, setModal, reload }: AdminUse
     )
 }
 
-function EditUserForm({ user, setModalOpened, setModal, reload }: UserProps) {
+export function EditUserForm({ user, setModalOpened, setModal, reload, adminPanel }: UserProps) {
     const [pfpVersion, setPfpVersion] = useState(Date.now());
     const [chPw, setChPw] = useState(false)
     const pfpInputRef = useRef<HTMLInputElement>(null)
@@ -138,12 +139,16 @@ function EditUserForm({ user, setModalOpened, setModal, reload }: UserProps) {
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
                 Username:<input type="text" name="username" placeholder="Username" defaultValue={user.username} />
             </div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                Admin:<input type="checkbox" name="admin" defaultChecked={user.admin} />
-            </div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                Accepted: <input type="checkbox" name="accepted" defaultChecked={user.accepted} />
-            </div>
+            {adminPanel &&
+                <>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
+                        Admin:<input type="checkbox" name="admin" defaultChecked={user.admin} />
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
+                        Accepted: <input type="checkbox" name="accepted" defaultChecked={user.accepted} />
+                    </div>
+                </>
+            }
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px", flexDirection: "column" }}>
                 {chPw ? (
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%", backgroundColor: "var(--bg-dark)", border: "2px solid var(--border)", borderRadius: "10px" }} >
@@ -221,7 +226,7 @@ function AdminUserCard({ user, setModalOpened, setModal, reload }: UserProps) {
         setModal({
             title: `Edit user "${user.username}"`,
             elements:
-                <EditUserForm user={user} setModal={setModal} setModalOpened={setModalOpened} reload={reload} />
+                <EditUserForm user={user} setModal={setModal} setModalOpened={setModalOpened} reload={reload} adminPanel />
         })
         setModalOpened(true)
     }

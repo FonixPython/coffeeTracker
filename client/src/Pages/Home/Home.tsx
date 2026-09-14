@@ -9,6 +9,7 @@ import React, { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
 import { TopBar } from "../../Compontents/TopBar/TopBar"
 import type { User } from "../../Compontents/AdminUsers/AdminUsers"
+import { ModalWrapper } from "../../Compontents/ModalWrapper/ModalWrapper"
 
 export function HomePage() {
     const [searchParams, setSearchParams] = useSearchParams()
@@ -16,6 +17,13 @@ export function HomePage() {
     const handleResize = (w: Window, e: React.UIEvent) => {
         setCurrWidth(window.innerWidth)
     }
+
+    const [modalOpened, setModalOpened] = useState<boolean>(false)
+    const [modal, setModal] = useState({
+        title: "",
+        elements: <></>
+    })
+
 
     useEffect(() => {
         window.addEventListener("resize", handleResize)
@@ -110,7 +118,10 @@ export function HomePage() {
     return (
         <>
             <Toaster theme="system" />
-            <TopBar user={user} />
+            <TopBar user={user} setModalOpened={setModalOpened} setModal={setModal} reload={loadUserData} />
+            <ModalWrapper isopen={modalOpened} setOpen={setModalOpened} title={modal.title}>
+                {modal.elements}
+            </ModalWrapper>
             <main className="homePage">
                 <SectionCard>
                     <div style={{ margin: 10 }} className="topCard">
