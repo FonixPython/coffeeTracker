@@ -10,23 +10,19 @@ interface LoginPageProps {
 export function LoginPage({ permission }: LoginPageProps) {
     const navigate = useNavigate()
     const [mode, setMode] = useState("login")
-    const [credentials, setCredentials] = useState({
-        username: "",
-        password: ""
-    })
-    const handleChange = (e: React.ChangeEvent) => {
-        const { name, value } = e.currentTarget
-        setCredentials(prev => ({ ...prev, [name]: value }))
-    }
+
     async function login(e: React.SubmitEvent) {
         e.preventDefault()
+        const data = new FormData(e.target)
+        const username = data.get("username")
+        const password = data.get("password")
         if (mode == "login") {
             const result = await fetch("/api/login", {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(credentials)
+                body: JSON.stringify({ username, password })
             })
             switch (result.status) {
                 case 200:
@@ -48,7 +44,7 @@ export function LoginPage({ permission }: LoginPageProps) {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(credentials)
+                body: JSON.stringify({ username, password })
             })
             switch (result.status) {
                 case 200:
@@ -79,8 +75,8 @@ export function LoginPage({ permission }: LoginPageProps) {
                 <div className={`loginBox ${mode}`}>
                     <p>coffeeTracker</p>
                     <form onSubmit={login}>
-                        <input type="username" name="username" placeholder="Username" onChange={handleChange} required={true} />
-                        <input type="password" name="password" placeholder="Password" onChange={handleChange} required={true} />
+                        <input type="username" name="username" placeholder="Username" required={true} />
+                        <input type="password" name="password" placeholder="Password" required={true} />
                         <input type="submit" value={mode == "login" ? "Login" : "Register"} />
                         or
                         <p className="modeSwitcher" onClick={() => (setMode(mode == "login" ? "register" : "login"))}>{mode == "login" ? "Register" : "Login"}</p>

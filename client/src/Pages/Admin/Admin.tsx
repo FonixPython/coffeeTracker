@@ -12,7 +12,7 @@ import { AdminUsers, type User } from "../../Compontents/AdminUsers/AdminUsers"
 import { TopBar } from "../../Compontents/TopBar/TopBar"
 
 export function AdminPage() {
-    const [modalOpened, setModalOpened] = useState<boolean>()
+    const [modalOpened, setModalOpened] = useState<boolean>(false)
     const [modal, setModal] = useState({
         title: "",
         elements: <></>,

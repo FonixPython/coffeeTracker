@@ -105,9 +105,28 @@ export function HomePage() {
         getPoolTransactions()
     }, [pool])
 
-    async function handleActionButton(e: React.MouseEvent) {
-        if (!pool) {
-            toast.error("No pool selected!")
+    async function handleActionButton(e: React.MouseEvent<HTMLButtonElement>) {
+        if (pool != null) {
+            const buttonName = e.currentTarget.name
+            let elements = <></>
+            let title = ""
+            switch (buttonName) {
+                case "addCoffee":
+                    elements =
+                        <form>
+                            
+                        </form>
+                    break
+                case "addMoney":
+                    break
+                case "drink":
+                    break
+            }
+            setModal({
+                title,
+                elements
+            })
+            setModalOpened(true)
         }
     }
 
