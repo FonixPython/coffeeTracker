@@ -164,13 +164,13 @@ export function HomePage() {
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
                                 <p>Amount of coffee:</p>
                                 <div>
-                                    <input type="number" name="coffeeAmount" placeholder="Weight in gramms" />g
+                                    <input type="number" name="coffeeAmount" placeholder="Weight in gramms" />
                                 </div>
                             </div>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
                                 <p>Cost of coffee:</p>
                                 <div>
-                                    <input type="number" name="moneyAmount" placeholder="Cost in HUF" />Ft
+                                    <input type="number" name="moneyAmount" placeholder="Cost in HUF" />
                                 </div>
                             </div>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
