@@ -5,10 +5,7 @@
     flex-direction: column;
 }
 
-.homePage .machineName {
-    font-weight: 200;
-    font-size: 1.5rem;
-}
+
 
 .homePage .userBalance {
     font-weight: 500;
@@ -67,11 +64,16 @@
     flex-wrap: wrap;
 }
 
-.topCard select {
+select {
     text-align: left;
     background-color: transparent;
     border: 0;
     outline: none;
+}
+
+.machineName {
+    font-weight: 200;
+    font-size: 1.5rem;
 }
 
 @media (max-width:800px) {

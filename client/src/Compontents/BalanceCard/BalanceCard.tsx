@@ -1,12 +1,19 @@
+import { formatMoney, formatWeight, type Balance } from "../../Pages/Home/Home"
 import "./BalanceCard.css"
 
-export function BalanceCard(props) {
+
+interface BalanceCardProps {
+    balance: Balance,
+    highlighted: boolean
+}
+
+export function BalanceCard({ balance, highlighted }: BalanceCardProps) {
     return (
-        <div className="balanceCard">
-            <p className="machineName">{props.balance.poolName}</p>
+        <div className="balanceCard" style={highlighted ? { borderColor: "var(--secondary)", borderWidth: "3px", scale: "1.01" } : {}}>
+            <p className="machineName">{balance.poolName}</p>
             <hr />
-            <p className="userBalance">{props.balance.moneyBalance} Ft</p>
-            <p className="coffeeBalance">{props.balance.coffeeAmount}g of beans</p>
+            <p className="userBalance">{formatMoney(balance.moneyBalance || 0)}</p>
+            <p className="coffeeBalance">{formatWeight(balance.coffeeAmount || 0)} of beans</p>
         </div>
     )
 }

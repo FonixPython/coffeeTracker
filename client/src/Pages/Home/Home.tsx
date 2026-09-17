@@ -11,6 +11,21 @@ import { TopBar } from "../../Compontents/TopBar/TopBar"
 import type { User } from "../../Compontents/AdminUsers/AdminUsers"
 import { ModalWrapper } from "../../Compontents/ModalWrapper/ModalWrapper"
 
+export const formatWeight = (w: number) => {
+    return (w > 1000) ? `${(w / 1000).toFixed(2)} kg` : `${w} g`
+}
+
+export const formatMoney = (m: number) => {
+    return `${m.toLocaleString("en-US").replace(/,/g, " ")} Ft`
+}
+
+export interface Balance {
+    poolId: string,
+    poolName: string,
+    coffeeAmount: number | null,
+    moneyBalance: number | null
+}
+
 export function HomePage() {
     const [searchParams, setSearchParams] = useSearchParams()
     const [currWidth, setCurrWidth] = useState(window.innerWidth)
@@ -24,18 +39,10 @@ export function HomePage() {
         elements: <></>
     })
 
-
     useEffect(() => {
         window.addEventListener("resize", handleResize)
         return () => window.removeEventListener("resize", handleResize)
     })
-
-    interface Balance {
-        poolId: string,
-        poolName: string,
-        coffeeAmount: number | null,
-        moneyAmount: number | null
-    }
 
     const [user, setUser] = useState<User | null>(null)
     const [balances, setBalances] = useState<Balance[]>([])
@@ -105,6 +112,35 @@ export function HomePage() {
         getPoolTransactions()
     }, [pool])
 
+
+    async function addMoneyAction(e: React.SubmitEvent) {
+        e.preventDefault()
+        const data = new FormData(e.target)
+        const coffeeAmount = Number(data.get("coffeeAmount"))
+        const moneyAmount = Number(data.get("moneyAmount"))
+        const result = await fetch("/api/addTransaction", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                type: "addCoffee",
+                coffeeAmount,
+                moneyAmount,
+                poolId: pool,
+            })
+        })
+        if (result.ok) {
+            loadUserData()
+            setModalOpened(false)
+            setModal({ title: "", elements: <></> })
+            toast.success("Successfully added transaction!")
+        } else {
+            const resultJson = await result.json()
+            toast.error(resultJson.message)
+        }
+    }
+
     async function handleActionButton(e: React.MouseEvent<HTMLButtonElement>) {
         if (pool != null) {
             const buttonName = e.currentTarget.name
@@ -112,9 +148,38 @@ export function HomePage() {
             let title = ""
             switch (buttonName) {
                 case "addCoffee":
+                    title = "Add coffee to pool"
                     elements =
-                        <form>
-                            
+                        <form className="newTransactionForm" action="" onSubmit={addMoneyAction}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
+                                <p>Pool: </p>
+                                <select value={pool || ""} onChange={(e) => {
+                                    const newPool = e.target.value
+                                    setPool(newPool)
+                                    setSearchParams({ pool: newPool })
+                                }} className="machineName">
+                                    {balances.map((balance) => (<option key={balance.poolId} value={balance.poolId}>{balance.poolName}</option>))}
+                                </select>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
+                                <p>Amount of coffee:</p>
+                                <div>
+                                    <input type="number" name="coffeeAmount" placeholder="Weight in gramms" />g
+                                </div>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
+                                <p>Cost of coffee:</p>
+                                <div>
+                                    <input type="number" name="moneyAmount" placeholder="Cost in HUF" />Ft
+                                </div>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
+                                <input type="submit" value="Save" style={{ width: "100%", margin: "3px" }} />
+                                <input type="button" className="dangerButton" style={{ width: "100%", margin: "3px" }} onClick={() => {
+                                    setModalOpened(false)
+                                    setModal({ title: "", elements: <></> })
+                                }} value="Cancel" />
+                            </div>
                         </form>
                     break
                 case "addMoney":
@@ -151,8 +216,8 @@ export function HomePage() {
                         }} className="machineName">
                             {balances.map((balance) => (<option key={balance.poolId} value={balance.poolId}>{balance.poolName}</option>))}
                         </select>
-                        <p className="userBalance">{selectedBalance?.moneyAmount ?? 0} Ft</p>
-                        <p className="coffeeBalance">{(selectedBalance?.coffeeAmount ?? 0) / 1000} kg</p>
+                        <p className="userBalance">{formatMoney(selectedBalance?.moneyBalance || 0)}</p>
+                        <p className="coffeeBalance">{formatWeight(selectedBalance?.coffeeAmount || 0)}</p>
                     </div>
                 </SectionCard>
                 <SectionCard className="actionContainer">
@@ -174,7 +239,7 @@ export function HomePage() {
                         {transactions.map((transaction) => (<HistoryCard transaction={transaction} />))}
                     </SectionCard>
                     <SectionCard collapseable title="Balances" wrap={currWidth > 800} currWidth={currWidth}>
-                        {balances.map((balance) => (<BalanceCard balance={balance} />))}
+                        {balances.map((balance) => (<BalanceCard balance={balance} highlighted={balance.poolId == pool} />))}
                     </SectionCard>
                 </div>
             </main>
