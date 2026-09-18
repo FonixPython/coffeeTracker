@@ -10,6 +10,7 @@ import { useSearchParams } from "react-router-dom"
 import { TopBar } from "../../Compontents/TopBar/TopBar"
 import type { User } from "../../Compontents/AdminUsers/AdminUsers"
 import { ModalWrapper } from "../../Compontents/ModalWrapper/ModalWrapper"
+import { Transaction } from "../../Compontents/AdminPools/AdminPools"
 
 export const formatWeight = (w: number) => {
     return (w > 1000) ? `${(w / 1000).toFixed(2)} kg` : `${w} g`
@@ -26,10 +27,15 @@ export interface Balance {
     moneyBalance: number | null
 }
 
+export interface Variation {
+    id: string,
+    coffeeAmount: number
+}
+
 export function HomePage() {
     const [searchParams, setSearchParams] = useSearchParams()
     const [currWidth, setCurrWidth] = useState(window.innerWidth)
-    const handleResize = (w: Window, e: React.UIEvent) => {
+    const handleResize = () => {
         setCurrWidth(window.innerWidth)
     }
 
@@ -46,8 +52,8 @@ export function HomePage() {
 
     const [user, setUser] = useState<User | null>(null)
     const [balances, setBalances] = useState<Balance[]>([])
-    const [transactions, setTransactions] = useState([])
-    const [variations, setVariations] = useState([])
+    const [transactions, setTransactions] = useState<Transaction[]>([])
+    const [variations, setVariations] = useState<Variation[]>([])
     const [pool, setPool] = useState<string | null>(searchParams.get("pool") || null)
 
     async function loadUserData() {
@@ -59,13 +65,6 @@ export function HomePage() {
             if (balancesResult.ok) {
                 const balancesJsonResult = await balancesResult.json()
                 setBalances(balancesJsonResult.result)
-                if (searchParams.get("pool") != null) {
-                    setPool(searchParams.get("pool"))
-                } else if (balances.length != 0) {
-                    setPool(balancesJsonResult.result.poolId)
-                } else {
-                    setPool(null)
-                }
             } else {
                 throw Error("Error fetching balances!")
             }
@@ -109,11 +108,23 @@ export function HomePage() {
     }, [])
 
     useEffect(() => {
+        if (searchParams.get("pool") != null) {
+            console.log(searchParams.get("pool"))
+            setPool(searchParams.get("pool"))
+        } else if (balances.length != 0) {
+            setSearchParams({ pool: balances[0].poolId })
+            setPool(balances[0].poolId)
+        } else {
+            setPool(null)
+        }
+    }, [balances])
+
+    useEffect(() => {
         getPoolTransactions()
     }, [pool])
 
 
-    async function addMoneyAction(e: React.SubmitEvent) {
+    async function addCoffeeAction(e: React.SubmitEvent) {
         e.preventDefault()
         const data = new FormData(e.target)
         const coffeeAmount = Number(data.get("coffeeAmount"))
@@ -135,6 +146,35 @@ export function HomePage() {
             setModalOpened(false)
             setModal({ title: "", elements: <></> })
             toast.success("Successfully added transaction!")
+            getPoolTransactions()
+        } else {
+            const resultJson = await result.json()
+            toast.error(resultJson.message)
+        }
+    }
+
+    async function addMoneyAction(e: React.SubmitEvent) {
+        e.preventDefault()
+        const data = new FormData(e.target)
+        const moneyAmount = Number(data.get("moneyAmount"))
+        const result = await fetch("/api/addTransaction", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                type: "addMoney",
+                coffeeAmount: 0,
+                moneyAmount,
+                poolId: pool,
+            })
+        })
+        if (result.ok) {
+            setModalOpened(false)
+            setModal({ title: "", elements: <></> })
+            toast.success("Successfully added transaction!")
+            loadUserData()
+            getPoolTransactions()
         } else {
             const resultJson = await result.json()
             toast.error(resultJson.message)
@@ -150,7 +190,7 @@ export function HomePage() {
                 case "addCoffee":
                     title = "Add coffee to pool"
                     elements =
-                        <form className="newTransactionForm" action="" onSubmit={addMoneyAction}>
+                        <form className="newTransactionForm" action="" onSubmit={addCoffeeAction}>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
                                 <p>Pool: </p>
                                 <select value={pool || ""} onChange={(e) => {
@@ -163,15 +203,11 @@ export function HomePage() {
                             </div>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
                                 <p>Amount of coffee:</p>
-                                <div>
-                                    <input type="number" name="coffeeAmount" placeholder="Weight in gramms" />
-                                </div>
+                                <input type="number" name="coffeeAmount" placeholder="Weight in gramms" />
                             </div>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
                                 <p>Cost of coffee:</p>
-                                <div>
-                                    <input type="number" name="moneyAmount" placeholder="Cost in HUF" />
-                                </div>
+                                <input type="number" name="moneyAmount" placeholder="Cost in HUF" />
                             </div>
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
                                 <input type="submit" value="Save" style={{ width: "100%", margin: "3px" }} />
@@ -183,8 +219,61 @@ export function HomePage() {
                         </form>
                     break
                 case "addMoney":
+                    title = "Add money to pool"
+                    elements =
+                        <form className="newTransactionForm" action="" onSubmit={addMoneyAction}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
+                                <p>Pool: </p>
+                                <select value={pool || ""} onChange={(e) => {
+                                    const newPool = e.target.value
+                                    setPool(newPool)
+                                    setSearchParams({ pool: newPool })
+                                }} className="machineName">
+                                    {balances.map((balance) => (<option key={balance.poolId} value={balance.poolId}>{balance.poolName}</option>))}
+                                </select>
+                            </div>
+                            <input type="number" name="moneyAmount" placeholder="Cost in HUF" />
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
+                                <input type="submit" value="Save" style={{ width: "100%", margin: "3px" }} />
+                                <input type="button" className="dangerButton" style={{ width: "100%", margin: "3px" }} onClick={() => {
+                                    setModalOpened(false)
+                                    setModal({ title: "", elements: <></> })
+                                }} value="Cancel" />
+                            </div>
+                        </form>
                     break
                 case "drink":
+                    title = "Drink from pool"
+                    elements =
+                        <form className="newTransactionForm" action="" onSubmit={addMoneyAction}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
+                                <p>Pool: </p>
+                                <select value={pool || ""} onChange={(e) => {
+                                    const newPool = e.target.value
+                                    setPool(newPool)
+                                    setSearchParams({ pool: newPool })
+                                }} className="machineName">
+                                    {balances.map((balance) => (<option key={balance.poolId} value={balance.poolId}>{balance.poolName}</option>))}
+                                </select>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
+                                <p>Pool: </p>
+                                <select value={pool || ""} onChange={(e) => {
+                                    const newPool = e.target.value
+                                    setPool(newPool)
+                                    setSearchParams({ pool: newPool })
+                                }} className="machineName">
+                                    {variations.map((variation) => (<option key={variation.id} value={variation.id}>{variation.id}</option>))}
+                                </select>
+                            </div>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
+                                <input type="submit" value="Save" style={{ width: "100%", margin: "3px" }} />
+                                <input type="button" className="dangerButton" style={{ width: "100%", margin: "3px" }} onClick={() => {
+                                    setModalOpened(false)
+                                    setModal({ title: "", elements: <></> })
+                                }} value="Cancel" />
+                            </div>
+                        </form>
                     break
             }
             setModal({

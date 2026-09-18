@@ -25,7 +25,7 @@ export async function getBalances(req: Request & Record<string, any>, res: Respo
 export async function getTransactions(req: Request & Record<string, any>, res: Response) {
     try {
         const poolId = Array.isArray(req.params.poolId) ? req.params.poolId[0] : req.params.poolId;
-        const transactions = await prisma.transaction.findMany({ where: { userId: req.user.id, poolId: poolId } })
+        const transactions = await prisma.transaction.findMany({ where: { userId: req.user.id, poolId: poolId }, orderBy: { dateOfTransaction: "desc" } })
         const currentTime = Date.now()
         const returnArray = []
         for (let i = 0; i < transactions.length; i++) {
@@ -34,7 +34,7 @@ export async function getTransactions(req: Request & Record<string, any>, res: R
                 edit: currentTime - transactions[i].dateOfTransaction.getTime() < 1000 * 60 * 60
             })
         }
-        return res.json({ message: "Successfully retrieved transactions!", result: transactions || [] }).status(200)
+        return res.json({ message: "Successfully retrieved transactions!", result: returnArray || [] }).status(200)
     } catch (e) {
         console.log(e)
         return res.status(500).json({ message: "Internal server error!", result: [] })
@@ -59,7 +59,7 @@ export function calculateCoffeeCost(poolId: string): number | null {
 
 export async function addTransaction(req: Request & Record<string, any>, res: Response) {
     try {
-        if (!req.body.poolId || !req.body.moneyAmount || !req.body.coffeeAmount || !req.body.type) {
+        if (!req.body.poolId == undefined || req.body.moneyAmount == undefined || !req.body.coffeeAmount == undefined || !req.body.type == undefined) {
             return res.status(400).json({ message: "Invalid request!", result: null })
         }
         const data = {
