@@ -10,7 +10,8 @@ import { useSearchParams } from "react-router-dom"
 import { TopBar } from "../../Compontents/TopBar/TopBar"
 import type { User } from "../../Compontents/AdminUsers/AdminUsers"
 import { ModalWrapper } from "../../Compontents/ModalWrapper/ModalWrapper"
-import { Transaction } from "../../Compontents/AdminPools/AdminPools"
+import type { Transaction } from "../../Compontents/AdminPools/AdminPools"
+import { AddTransactionModal } from "../../Compontents/AddTransactionModal/AddTransactionModal"
 
 export const formatWeight = (w: number) => {
     return (w > 1000) ? `${(w / 1000).toFixed(2)} kg` : `${w} g`
@@ -123,162 +124,37 @@ export function HomePage() {
         getPoolTransactions()
     }, [pool])
 
-
-    async function addCoffeeAction(e: React.SubmitEvent) {
-        e.preventDefault()
-        const data = new FormData(e.target)
-        const coffeeAmount = Number(data.get("coffeeAmount"))
-        const moneyAmount = Number(data.get("moneyAmount"))
-        const result = await fetch("/api/addTransaction", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                type: "addCoffee",
-                coffeeAmount,
-                moneyAmount,
-                poolId: pool,
-            })
-        })
-        if (result.ok) {
-            loadUserData()
-            setModalOpened(false)
-            setModal({ title: "", elements: <></> })
-            toast.success("Successfully added transaction!")
-            getPoolTransactions()
-        } else {
-            const resultJson = await result.json()
-            toast.error(resultJson.message)
-        }
-    }
-
-    async function addMoneyAction(e: React.SubmitEvent) {
-        e.preventDefault()
-        const data = new FormData(e.target)
-        const moneyAmount = Number(data.get("moneyAmount"))
-        const result = await fetch("/api/addTransaction", {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                type: "addMoney",
-                coffeeAmount: 0,
-                moneyAmount,
-                poolId: pool,
-            })
-        })
-        if (result.ok) {
-            setModalOpened(false)
-            setModal({ title: "", elements: <></> })
-            toast.success("Successfully added transaction!")
-            loadUserData()
-            getPoolTransactions()
-        } else {
-            const resultJson = await result.json()
-            toast.error(resultJson.message)
-        }
-    }
-
     async function handleActionButton(e: React.MouseEvent<HTMLButtonElement>) {
         if (pool != null) {
             const buttonName = e.currentTarget.name
-            let elements = <></>
             let title = ""
             switch (buttonName) {
                 case "addCoffee":
                     title = "Add coffee to pool"
-                    elements =
-                        <form className="newTransactionForm" action="" onSubmit={addCoffeeAction}>
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                                <p>Pool: </p>
-                                <select value={pool || ""} onChange={(e) => {
-                                    const newPool = e.target.value
-                                    setPool(newPool)
-                                    setSearchParams({ pool: newPool })
-                                }} className="machineName">
-                                    {balances.map((balance) => (<option key={balance.poolId} value={balance.poolId}>{balance.poolName}</option>))}
-                                </select>
-                            </div>
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                                <p>Amount of coffee:</p>
-                                <input type="number" name="coffeeAmount" placeholder="Weight in gramms" />
-                            </div>
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                                <p>Cost of coffee:</p>
-                                <input type="number" name="moneyAmount" placeholder="Cost in HUF" />
-                            </div>
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                                <input type="submit" value="Save" style={{ width: "100%", margin: "3px" }} />
-                                <input type="button" className="dangerButton" style={{ width: "100%", margin: "3px" }} onClick={() => {
-                                    setModalOpened(false)
-                                    setModal({ title: "", elements: <></> })
-                                }} value="Cancel" />
-                            </div>
-                        </form>
                     break
                 case "addMoney":
                     title = "Add money to pool"
-                    elements =
-                        <form className="newTransactionForm" action="" onSubmit={addMoneyAction}>
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                                <p>Pool: </p>
-                                <select value={pool || ""} onChange={(e) => {
-                                    const newPool = e.target.value
-                                    setPool(newPool)
-                                    setSearchParams({ pool: newPool })
-                                }} className="machineName">
-                                    {balances.map((balance) => (<option key={balance.poolId} value={balance.poolId}>{balance.poolName}</option>))}
-                                </select>
-                            </div>
-                            <input type="number" name="moneyAmount" placeholder="Cost in HUF" />
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                                <input type="submit" value="Save" style={{ width: "100%", margin: "3px" }} />
-                                <input type="button" className="dangerButton" style={{ width: "100%", margin: "3px" }} onClick={() => {
-                                    setModalOpened(false)
-                                    setModal({ title: "", elements: <></> })
-                                }} value="Cancel" />
-                            </div>
-                        </form>
                     break
                 case "drink":
                     title = "Drink from pool"
-                    elements =
-                        <form className="newTransactionForm" action="" onSubmit={addMoneyAction}>
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                                <p>Pool: </p>
-                                <select value={pool || ""} onChange={(e) => {
-                                    const newPool = e.target.value
-                                    setPool(newPool)
-                                    setSearchParams({ pool: newPool })
-                                }} className="machineName">
-                                    {balances.map((balance) => (<option key={balance.poolId} value={balance.poolId}>{balance.poolName}</option>))}
-                                </select>
-                            </div>
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                                <p>Pool: </p>
-                                <select value={pool || ""} onChange={(e) => {
-                                    const newPool = e.target.value
-                                    setPool(newPool)
-                                    setSearchParams({ pool: newPool })
-                                }} className="machineName">
-                                    {variations.map((variation) => (<option key={variation.id} value={variation.id}>{variation.id}</option>))}
-                                </select>
-                            </div>
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                                <input type="submit" value="Save" style={{ width: "100%", margin: "3px" }} />
-                                <input type="button" className="dangerButton" style={{ width: "100%", margin: "3px" }} onClick={() => {
-                                    setModalOpened(false)
-                                    setModal({ title: "", elements: <></> })
-                                }} value="Cancel" />
-                            </div>
-                        </form>
                     break
+                default:
+                    return null
             }
             setModal({
                 title,
-                elements
+                elements: <AddTransactionModal
+                    type={buttonName}
+                    pool={pool}
+                    balances={balances}
+                    variations={variations}
+                    setModal={setModal}
+                    setModalOpened={setModalOpened}
+                    setPool={setPool}
+                    setSearchParams={setSearchParams}
+                    loadUserData={loadUserData}
+                    getPoolTransactions={getPoolTransactions}
+                />
             })
             setModalOpened(true)
         }

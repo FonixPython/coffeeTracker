@@ -1,7 +1,7 @@
 import express from 'express';
 import { Request, Response } from 'express';
 import { login, register, logout, checkAuth, deleteUser, editUser, changePassword } from './Controllers/userController.js';
-import { addTransaction, deleteTransaction, editTransaction, getBalances, getCoffeeVariations, getTransactions } from './Controllers/userActionController.js';
+import { addTransaction, deleteTransaction, editTransaction, getBalances, getCoffeeCost, getCoffeeVariations, getTransactions } from './Controllers/userActionController.js';
 import { authenticateAdmin, authenticateUser } from './auth.js';
 import { addPool, addVariation, deletePool, deleteSpecifiedUser, deleteVariation, editPool, editVariation, getAllUsers, getPools } from './Controllers/adminActionController.js';
 import { deleteProfilePictre, getProfilePicture, uploadMiddleware, uploadProfilePicture } from './Controllers/pfpController.js';
@@ -30,6 +30,7 @@ router.get("/api/getVariations", authenticateUser, getCoffeeVariations)
 router.post("/api/addTransaction", authenticateUser, addTransaction)
 router.post("/api/editTransaction/:transactionId", authenticateUser, editTransaction)
 router.delete("/api/deleteTransaction/:transactionId", authenticateUser, deleteTransaction)
+router.get("/api/coffeeCost/:poolId", authenticateUser, getCoffeeCost)
 
 // Profile picture actions
 

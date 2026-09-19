@@ -37,60 +37,60 @@ export async function deleteSpecifiedUser(req: Request & Record<string, any>, re
 export async function getPools(req: Request, res: Response) {
     try {
         const result = await prisma.pool.findMany({ include: { transactions: true } })
-        return res.json({ message: "Successfully retrieved pools!", result: result }).status(500)
+        return res.status(500).json({ message: "Successfully retrieved pools!", result: result })
     } catch (e) {
         console.log(e)
-        return res.json({ message: "Internal server error!", result: null }).status(500)
+        return res.status(500).json({ message: "Internal server error!", result: null })
     }
 }
 
 export async function addPool(req: Request, res: Response) {
     try {
         if (!req.body.name) {
-            return res.json({ message: "No pool name in request!" }).status(400)
+            return res.status(400).json({ message: "No pool name in request!" })
         }
         const result = await prisma.pool.create({ data: { name: req.body.name } })
         if (!result) {
-            return res.json({ message: "Internal server error!" }).status(500)
+            return res.status(500).json({ message: "Internal server error!" })
         }
-        return res.json({ message: "Successfully added pool!" }).status(200)
+        return res.json({ message: "Successfully added pool!" })
     } catch (e) {
         console.log(e)
-        return res.json({ message: "Internal server error!" }).status(500)
+        return res.status(500).json({ message: "Internal server error!" })
     }
 }
 
 export async function editPool(req: Request, res: Response) {
     try {
         if (!req.body.name || !req.params.poolId) {
-            return res.json({ message: "No pool name in request!" }).status(400)
+            return res.status(400).json({ message: "No pool name in request!" })
         }
         const poolId = Array.isArray(req.params.poolId) ? req.params.poolId[0] : req.params.poolId;
         const result = await prisma.pool.update({ where: { id: poolId }, data: { name: req.body.name } })
         if (!result) {
-            return res.json({ message: "Internal server error!" }).status(500)
+            return res.status(500).json({ message: "Internal server error!" })
         }
-        return res.json({ message: "Successfully edited pool!" }).status(200)
+        return res.json({ message: "Successfully edited pool!" })
     } catch (e) {
         console.log(e)
-        return res.json({ message: "Internal server error!" }).status(500)
+        return res.status(500).json({ message: "Internal server error!" })
     }
 }
 
 export async function deletePool(req: Request, res: Response) {
     try {
         if (!req.params.poolId) {
-            return res.json({ message: "No pool name in request!" }).status(400)
+            return res.status(400).json({ message: "No pool name in request!" })
         }
         const poolId = Array.isArray(req.params.poolId) ? req.params.poolId[0] : req.params.poolId;
         const result = await prisma.pool.delete({ where: { id: poolId } })
         if (!result) {
-            return res.json({ message: "Internal server error!" }).status(500)
+            return res.status(500).json({ message: "Internal server error!" })
         }
-        return res.json({ message: "Successfully deleted pool!" }).status(200)
+        return res.json({ message: "Successfully deleted pool!" })
     } catch (e) {
         console.log(e)
-        return res.json({ message: "Internal server error!" }).status(500)
+        return res.status(500).json({ message: "Internal server error!" })
     }
 }
 
@@ -99,16 +99,16 @@ export async function deletePool(req: Request, res: Response) {
 export async function addVariation(req: Request, res: Response) {
     try {
         if (!req.body.id || !req.body.coffeeAmount) {
-            return res.json({ message: "Invalid request!" }).status(400)
+            return res.status(400).json({ message: "Invalid request!" })
         }
         const result = await prisma.coffeeVariation.create({ data: { id: req.body.id, coffeeAmount: req.body.coffeeAmount } })
         if (!result) {
-            return res.json({ message: "Internal server error!" }).status(500)
+            return res.status(500).json({ message: "Internal server error!" })
         }
-        return res.json({ message: "Successfully added variation!" }).status(200)
+        return res.json({ message: "Successfully added variation!" })
     } catch (e) {
         console.log(e)
-        return res.json({ message: "Internal server error!" }).status(500)
+        return res.status(500).json({ message: "Internal server error!" })
     }
 }
 
@@ -126,44 +126,55 @@ export async function editVariation(req: Request, res: Response) {
                 poolId: true,
             },
         })
-        await prisma.$transaction(
-            transactions.map((transaction) =>
-                prisma.transaction.update({
-                    where: {
-                        id: transaction.id,
-                    },
-                    data: {
-                        coffeeVariationId: req.body.name,
-                        coffeeAmount: req.body.coffeeAmount,
-                        moneyAmount: req.body.coffeeAmount * (calculateCoffeeCost(transaction.poolId) || 0),
-                    },
-                })
-            )
+        const transactionData = await Promise.all(
+            transactions.map(async (transaction) => {
+                const coffeeCost = await calculateCoffeeCost(transaction.poolId)
+
+                return {
+                    id: transaction.id,
+                    moneyAmount: req.body.coffeeAmount * (coffeeCost ?? 0),
+                }
+            })
         )
+
+        const updates = transactionData.map((transaction) =>
+            prisma.transaction.update({
+                where: {
+                    id: transaction.id,
+                },
+                data: {
+                    coffeeVariationId: req.body.id,
+                    coffeeAmount: req.body.coffeeAmount,
+                    moneyAmount: transaction.moneyAmount,
+                },
+            })
+        )
+
+        await prisma.$transaction(updates)
         const result = await prisma.coffeeVariation.update({ where: { id: req.body.id }, data: { id: req.body.name, coffeeAmount: req.body.coffeeAmount } })
         if (!result) {
-            return res.json({ message: "Internal server error!" }).status(500)
+            return res.status(500).json({ message: "Internal server error!" })
         }
-        return res.json({ message: "Successfully edited varitaion!" }).status(200)
+        return res.status(200).json({ message: "Successfully edited varitaion!" })
     } catch (e) {
         console.log(e)
-        return res.json({ message: "Internal server error!" }).status(500)
+        return res.status(500).json({ message: "Internal server error!" })
     }
 }
 
 export async function deleteVariation(req: Request, res: Response) {
     try {
         if (!req.params.variationId) {
-            return res.json({ message: "No pool name in request!" }).status(400)
+            return res.status(400).json({ message: "No pool name in request!" })
         }
         const variationId = Array.isArray(req.params.variationId) ? req.params.variationId[0] : req.params.variationId;
         const result = await prisma.coffeeVariation.delete({ where: { id: variationId } })
         if (!result) {
-            return res.json({ message: "Internal server error!" }).status(500)
+            return res.status(500).json({ message: "Internal server error!" })
         }
-        return res.json({ message: "Successfully deleted variation!" }).status(200)
+        return res.json({ message: "Successfully deleted variation!" })
     } catch (e) {
         console.log(e)
-        return res.json({ message: "Internal server error!" }).status(500)
+        return res.status(500).json({ message: "Internal server error!" })
     }
 }

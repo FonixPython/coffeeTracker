@@ -41,20 +41,28 @@ export async function getTransactions(req: Request & Record<string, any>, res: R
     }
 }
 
-export function calculateCoffeeCost(poolId: string): number | null {
+export async function calculateCoffeeCost(poolId: string): Promise<number | null> {
     try {
-        const poolData = prisma.transaction.aggregate({ where: { poolId: poolId, type: { in: ["drink", "addCoffee"] } }, _sum: { coffeeAmount: true, moneyAmount: true } })
-        poolData.then((data) => {
-            if (!data._sum.moneyAmount || !data._sum.coffeeAmount) {
-                return null
-            }
-            return data._sum.moneyAmount / data._sum.coffeeAmount
-        })
-        return null
+        const poolData = await prisma.transaction.aggregate({ where: { poolId: poolId, type: { in: ["drink", "addCoffee"] } }, _sum: { coffeeAmount: true, moneyAmount: true } })
+        if (!poolData._sum.moneyAmount || !poolData._sum.coffeeAmount) {
+            return null
+        }
+        return poolData._sum.moneyAmount / poolData._sum.coffeeAmount
     } catch (e) {
         console.log(e)
         throw e
     }
+}
+
+export async function getCoffeeCost(req: Request, res: Response) {
+    const poolId = Array.isArray(req.params.poolId) ? req.params.poolId[0] : req.params.poolId
+    try {
+        const cost = await calculateCoffeeCost(poolId)
+        return res.json({ message: "Successfully retrieved coffeeCost for pool!", result: cost })
+    } catch (e) {
+        return res.status(500).json({ message: "Internal server error!", result: [] })
+    }
+
 }
 
 export async function addTransaction(req: Request & Record<string, any>, res: Response) {
@@ -68,7 +76,7 @@ export async function addTransaction(req: Request & Record<string, any>, res: Re
         }
         switch (req.body.type) {
             case "drink":
-                const coffeeCost = calculateCoffeeCost(req.body.poolId)
+                const coffeeCost = await calculateCoffeeCost(req.body.poolId)
                 if (!coffeeCost) {
                     return res.status(500).json({ message: "No coffee" })
                 }
@@ -122,7 +130,7 @@ export async function editTransaction(req: Request & Record<string, any>, res: R
         const before = await prisma.transaction.findFirstOrThrow({ where: { id: transactionId } })
         switch (req.body.type) {
             case "drink":
-                const coffeeCost = calculateCoffeeCost(before.poolId)
+                const coffeeCost = await calculateCoffeeCost(before.poolId)
                 if (!coffeeCost) {
                     return res.status(500).json({ message: "No coffee" })
                 }
