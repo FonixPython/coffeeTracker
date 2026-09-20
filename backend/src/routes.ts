@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { login, register, logout, checkAuth, deleteUser, editUser, changePassword } from './Controllers/userController.js';
 import { addTransaction, deleteTransaction, editTransaction, getBalances, getCoffeeCost, getCoffeeVariations, getTransactions } from './Controllers/userActionController.js';
 import { authenticateAdmin, authenticateUser } from './auth.js';
-import { addPool, addVariation, deletePool, deleteSpecifiedUser, deleteVariation, editPool, editVariation, getAllUsers, getPools } from './Controllers/adminActionController.js';
+import { addPool, addVariation, deletePool, deleteSpecifiedUser, deleteVariation, editPool, editVariation, getAllUsers, getBalancesForSpecificUser, getPools } from './Controllers/adminActionController.js';
 import { deleteProfilePictre, getProfilePicture, uploadMiddleware, uploadProfilePicture } from './Controllers/pfpController.js';
 
 export const router = express.Router();
@@ -41,6 +41,7 @@ router.post("/api/uploadProfilePicture", authenticateUser, uploadMiddleware, upl
 // Actions for admin
 router.get("/api/getAllUsers", authenticateAdmin, getAllUsers)
 router.delete("/api/deleteSpecifiedUser/:userId", authenticateAdmin, deleteSpecifiedUser)
+router.get("/api/getBalancesForUser/:userId", authenticateAdmin, getBalancesForSpecificUser)
 
 router.get("/api/getPools", authenticateAdmin, getPools)
 router.post("/api/addPool", authenticateAdmin, addPool)

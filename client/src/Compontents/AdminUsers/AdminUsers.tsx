@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCheckDouble, faPenToSquare, faTrash } from "@fortawesome/free-solid-svg-icons"
 import { toast } from "sonner"
 import React, { useRef, useState } from "react"
+import type { Variation } from "../../Pages/Home/Home"
 
 export interface User {
     id: string,
@@ -20,7 +21,8 @@ interface AdminUsersProps {
     users: User[],
     setModalOpened: Function,
     setModal: Function,
-    reload: Function
+    reload: Function,
+    variations: Variation[]
 }
 
 interface UserProps {
@@ -28,14 +30,16 @@ interface UserProps {
     setModalOpened: Function,
     setModal: Function,
     reload: Function,
-    adminPanel?: boolean
+    adminPanel?: boolean,
+    variations?: Variation[]
+
 }
 
-export function AdminUsers({ users, setModalOpened, setModal, reload }: AdminUsersProps) {
+export function AdminUsers({ users, setModalOpened, setModal, reload, variations }: AdminUsersProps) {
     return (
         <>
             {users.map((user) => (
-                <AdminUserCard user={user} setModalOpened={setModalOpened} setModal={setModal} reload={reload} />
+                <AdminUserCard user={user} setModalOpened={setModalOpened} setModal={setModal} reload={reload} variations={variations} />
             ))}
         </>
     )
@@ -175,7 +179,7 @@ export function EditUserForm({ user, setModalOpened, setModal, reload, adminPane
     )
 }
 
-function AdminUserCard({ user, setModalOpened, setModal, reload }: UserProps) {
+function AdminUserCard({ user, setModalOpened, setModal, reload, variations }: UserProps) {
     async function deleteUserAction() {
         const result = await fetch("/api/deleteSpecifiedUser/" + user.id, { method: "DELETE" })
         if (result.ok) {
@@ -244,7 +248,7 @@ function AdminUserCard({ user, setModalOpened, setModal, reload }: UserProps) {
             }>
             <hr />
             {user.transactions.map((transaction) => (
-                <AdminTransactionCard transaction={transaction} setModalOpened={setModalOpened} setModal={setModal} reload={reload} />
+                <AdminTransactionCard transaction={transaction} setModalOpened={setModalOpened} setModal={setModal} reload={reload} variations={variations || []} pool={false} />
             ))}
         </SectionCard>
     )

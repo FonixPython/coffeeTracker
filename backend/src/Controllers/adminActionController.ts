@@ -5,13 +5,39 @@ import { calculateCoffeeCost } from "./userActionController.js";
 
 export async function getAllUsers(req: Request, res: Response) {
     try {
-        const result = await prisma.user.findMany({ include: { transactions: { orderBy: { dateOfTransaction: "desc" }, include: { pool: { select: { name: true } } } } }, omit: { passwordHash: true } })
+        const result = await prisma.user.findMany({ include: { transactions: { where: { type: { notIn: ["useUpMoney"] } }, orderBy: { dateOfTransaction: "desc" }, include: { pool: { select: { name: true } } } } }, omit: { passwordHash: true } })
         return res.json({ message: "Successfully retrieved users!", result: result })
     } catch (e) {
         console.log()
         return res.json({ message: "Intarnal server error!", result: null }).status(500)
     }
 }
+
+
+export async function getBalancesForSpecificUser(req: Request & Record<string, any>, res: Response) {
+    try {
+        const userId = Array.isArray(req.params.userId) ? req.params.userId[0] : req.params.userId
+        const pools = await prisma.pool.findMany()
+        const resultObject = []
+        for (let i = 0; i < pools.length; i++) {
+            const moneyAmount = await prisma.transaction.aggregate({ where: { poolId: pools[i].id, userId: userId }, _sum: { moneyAmount: true } })
+            const coffeeAmount = await prisma.transaction.aggregate({ where: { poolId: pools[i].id }, _sum: { coffeeAmount: true } })
+            const poolMoneyOnly = await prisma.transaction.aggregate({ where: { poolId: pools[i].id, type: { in: ["useUpMoney", "addMoney"] } }, _sum: { moneyAmount: true } })
+            resultObject.push({
+                poolId: pools[i].id,
+                poolName: pools[i].name,
+                moneyBalance: Number(moneyAmount._sum.moneyAmount),
+                coffeeAmount: Number(coffeeAmount._sum.coffeeAmount),
+                poolMoneyOnly: Number(poolMoneyOnly._sum.moneyAmount)
+            })
+        }
+        return res.json({ message: "Successfully retrieved balances!", result: resultObject })
+    } catch (e) {
+        console.log(e)
+        return res.status(500).json({ message: "Internal server error!", result: [] })
+    }
+}
+
 
 export async function deleteSpecifiedUser(req: Request & Record<string, any>, res: Response) {
     try {

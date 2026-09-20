@@ -4,6 +4,9 @@ import { faPenToSquare, faTrash, faMoneyBillWave, faCoffee } from "@fortawesome/
 import { toast } from "sonner"
 import "./AdminPools.css"
 import type { User } from "../AdminUsers/AdminUsers"
+import { EditTransactionModal } from "../EditTransactionModal/EditTransactionModal"
+import type { Balance, Variation } from "../../Pages/Home/Home"
+import { useState } from "react"
 
 export interface Transaction {
     id: string,
@@ -30,14 +33,16 @@ interface AdminPoolsProps {
     pools: Pool[],
     setModalOpened: Function,
     setModal: Function,
-    reload: Function
+    reload: Function,
+    variations: Variation[]
 }
 
 interface AdminPoolCardProps {
     pool: Pool,
     setModalOpened: Function,
     setModal: Function,
-    reload: Function
+    reload: Function,
+    variations: Variation[]
 }
 
 interface AdminTransactionCardProps {
@@ -45,20 +50,21 @@ interface AdminTransactionCardProps {
     setModalOpened: Function,
     setModal: Function,
     reload: Function,
-    pool: boolean
+    pool: boolean,
+    variations: Variation[]
 }
 
-export function AdminPools({ pools, setModalOpened, setModal, reload }: AdminPoolsProps) {
+export function AdminPools({ pools, setModalOpened, setModal, reload, variations }: AdminPoolsProps) {
     return (
         <>
             {pools.map((pool) => (
-                <AdminPoolCard pool={pool} setModal={setModal} setModalOpened={setModalOpened} reload={reload} />
+                <AdminPoolCard pool={pool} setModal={setModal} setModalOpened={setModalOpened} reload={reload} variations={variations} />
             ))}
         </>
     )
 }
 
-function AdminPoolCard({ pool, setModal, setModalOpened, reload }: AdminPoolCardProps) {
+function AdminPoolCard({ pool, setModal, setModalOpened, reload, variations }: AdminPoolCardProps) {
 
     async function deletePoolAction() {
         const result = await fetch("/api/deletePool/" + pool.id, { method: "DELETE" })
@@ -131,13 +137,24 @@ function AdminPoolCard({ pool, setModal, setModalOpened, reload }: AdminPoolCard
         </>}>
             <hr />
             {pool.transactions.length > 0 ? pool.transactions.map((transaction) => (
-                <AdminTransactionCard transaction={transaction} setModal={setModal} setModalOpened={setModalOpened} reload={reload} pool />
+                <AdminTransactionCard transaction={transaction} setModal={setModal} setModalOpened={setModalOpened} reload={reload} pool variations={variations} />
             )) : <p style={{ textAlign: "center", fontWeight: 200, color: "var(--text-muted)", margin: "15px" }}>No transactions yet!</p>}
         </SectionCard>
     )
 }
 
-export function AdminTransactionCard({ transaction, setModal, setModalOpened, reload, pool }: AdminTransactionCardProps) {
+export function AdminTransactionCard({ transaction, setModal, setModalOpened, reload, pool, variations }: AdminTransactionCardProps) {
+    const [balances, setBalances] = useState<Balance[]>([])
+    async function loadBalances() {
+        const balancesResponse = await fetch("/api/getBalancesForUser/" + transaction.user)
+        const balancesResponseJson = await balancesResponse.json()
+        if (balancesResponse.ok) {
+            setBalances(balancesResponseJson.result)
+        } else {
+            toast.error(balancesResponseJson.message)
+        }
+    }
+    loadBalances()
     let color = ""
     let text = ""
     switch (transaction.type) {
@@ -164,6 +181,21 @@ export function AdminTransactionCard({ transaction, setModal, setModalOpened, re
             break
     }
 
+    async function editTransaction() {
+        setModal({
+            title: "Edit transaction",
+            elements: <EditTransactionModal
+                transaction={transaction}
+                balances={balances}
+                variations={variations}
+                setModal={setModal}
+                setModalOpened={setModalOpened}
+                loadUserData={reload}
+                getPoolTransactions={() => { }}
+            />
+        })
+        setModalOpened(true)
+    }
 
     async function deleteTransactionAction() {
         const result = await fetch("/api/deleteTransaction/" + transaction.id, { method: "DELETE" })
@@ -204,7 +236,7 @@ export function AdminTransactionCard({ transaction, setModal, setModalOpened, re
                 </div>
             </div>
             <div>
-                <button className="actionButton" >
+                <button className="actionButton" onClick={editTransaction}>
                     <FontAwesomeIcon icon={faPenToSquare} style={{ margin: "5px", fontSize: "1.1rem" }} />
                 </button>
                 <button className="actionButton dangerButton" onClick={deleteTransactionModal}>

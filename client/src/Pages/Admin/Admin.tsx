@@ -82,7 +82,7 @@ export function AdminPage() {
         coffeeAmount: number
     }
 
-    const [variations, setVariations] = useState<Variation[]>()
+    const [variations, setVariations] = useState<Variation[]>([])
 
     async function loadVariations() {
         const result = await fetch("/api/getVariations")
@@ -285,7 +285,7 @@ export function AdminPage() {
                     <button onClick={addPoolModal}>Add Pool <FontAwesomeIcon icon={faPlus} /></button>
                 }>
                     <hr />
-                    <AdminPools pools={pools || []} setModal={setModal} setModalOpened={setModalOpened} reload={loadPools} />
+                    <AdminPools pools={pools || []} setModal={setModal} setModalOpened={setModalOpened} reload={loadPools} variations={variations} />
                 </SectionCard>
                 <SectionCard title="Variations" collapseable headerChildren={
                     <button onClick={addVariationModal}>Add variation<FontAwesomeIcon icon={faPlus} /></button>
@@ -305,7 +305,7 @@ export function AdminPage() {
                     <button onClick={addUserModal}>Register User<FontAwesomeIcon icon={faPlus} /></button>
                 }>
                     <hr />
-                    <AdminUsers users={users} setModal={setModal} setModalOpened={setModalOpened} reload={loadUsers} />
+                    <AdminUsers users={users} setModal={setModal} setModalOpened={setModalOpened} reload={loadUsers} variations={variations} />
                 </SectionCard>
             </main>
         </>

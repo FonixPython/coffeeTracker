@@ -44,25 +44,8 @@ export function HistoryCard({ transaction, setModal, setModalOpened, loadUserDat
     }
 
     async function editTransaction() {
-        let title = ""
-        switch (transaction.type) {
-            case "addCoffee":
-                title = "Add coffee to pool"
-                break
-            case "addMoney":
-                title = "Add money to pool"
-                break
-            case "drink":
-                title = "Drink from pool"
-                break
-            case "useMoney":
-                title = "Use money from pool"
-                break
-            default:
-                return null
-        }
         setModal({
-            title,
+            title: "Edit transaction",
             elements: <EditTransactionModal
                 transaction={transaction}
                 balances={balances}
