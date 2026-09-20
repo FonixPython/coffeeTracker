@@ -110,7 +110,6 @@ export function HomePage() {
 
     useEffect(() => {
         if (searchParams.get("pool") != null) {
-            console.log(searchParams.get("pool"))
             setPool(searchParams.get("pool"))
         } else if (balances.length != 0) {
             setSearchParams({ pool: balances[0].poolId })
@@ -148,6 +147,7 @@ export function HomePage() {
                     pool={pool}
                     balances={balances}
                     variations={variations}
+                    searchParams={searchParams}
                     setModal={setModal}
                     setModalOpened={setModalOpened}
                     setPool={setPool}

@@ -37,7 +37,7 @@ export async function deleteSpecifiedUser(req: Request & Record<string, any>, re
 export async function getPools(req: Request, res: Response) {
     try {
         const result = await prisma.pool.findMany({ include: { transactions: true } })
-        return res.status(500).json({ message: "Successfully retrieved pools!", result: result })
+        return res.json({ message: "Successfully retrieved pools!", result: result })
     } catch (e) {
         console.log(e)
         return res.status(500).json({ message: "Internal server error!", result: null })
