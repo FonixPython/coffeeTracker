@@ -8,11 +8,13 @@ export async function getBalances(req: Request & Record<string, any>, res: Respo
         for (let i = 0; i < pools.length; i++) {
             const moneyAmount = await prisma.transaction.aggregate({ where: { poolId: pools[i].id, userId: req.user.id }, _sum: { moneyAmount: true } })
             const coffeeAmount = await prisma.transaction.aggregate({ where: { poolId: pools[i].id }, _sum: { coffeeAmount: true } })
+            const poolMoneyOnly = await prisma.transaction.aggregate({ where: { poolId: pools[i].id, type: { in: ["useUpMoney", "addMoney"] } }, _sum: { moneyAmount: true } })
             resultObject.push({
                 poolId: pools[i].id,
                 poolName: pools[i].name,
-                moneyBalance: moneyAmount._sum.moneyAmount,
-                coffeeAmount: coffeeAmount._sum.coffeeAmount
+                moneyBalance: Number(moneyAmount._sum.moneyAmount),
+                coffeeAmount: Number(coffeeAmount._sum.coffeeAmount),
+                poolMoneyOnly: Number(poolMoneyOnly._sum.moneyAmount)
             })
         }
         return res.json({ message: "Successfully retrieved balances!", result: resultObject })
@@ -25,7 +27,7 @@ export async function getBalances(req: Request & Record<string, any>, res: Respo
 export async function getTransactions(req: Request & Record<string, any>, res: Response) {
     try {
         const poolId = Array.isArray(req.params.poolId) ? req.params.poolId[0] : req.params.poolId;
-        const transactions = await prisma.transaction.findMany({ where: { userId: req.user.id, poolId: poolId }, orderBy: { dateOfTransaction: "desc" } })
+        const transactions = await prisma.transaction.findMany({ where: { userId: req.user.id, poolId: poolId, type: { notIn: ["useUpMoney"] } }, orderBy: { dateOfTransaction: "desc" } })
         const currentTime = Date.now()
         const returnArray = []
         for (let i = 0; i < transactions.length; i++) {
@@ -43,7 +45,7 @@ export async function getTransactions(req: Request & Record<string, any>, res: R
 
 export async function calculateCoffeeCost(poolId: string): Promise<number | null> {
     try {
-        const poolData = await prisma.transaction.aggregate({ where: { poolId: poolId, type: { in: ["drink", "addCoffee"] } }, _sum: { coffeeAmount: true, moneyAmount: true } })
+        const poolData = await prisma.transaction.aggregate({ where: { poolId: poolId, type: { in: ["drink", "addCoffee", "useMoney"] } }, _sum: { coffeeAmount: true, moneyAmount: true } })
         if (!poolData._sum.moneyAmount || !poolData._sum.coffeeAmount) {
             return null
         }
@@ -76,13 +78,32 @@ export async function addTransaction(req: Request & Record<string, any>, res: Re
         }
         switch (req.body.type) {
             case "drink":
+                if (!req.body.coffeeVariation == undefined) {
+                    return res.status(400).json({ message: "Invalid request!", result: null })
+                }
                 const coffeeCost = await calculateCoffeeCost(req.body.poolId)
                 if (!coffeeCost) {
                     return res.status(500).json({ message: "No coffee" })
                 }
-                const variation = await prisma.coffeeVariation.findFirstOrThrow({ where: { id: req.body.coffeeVariation } })
-                data.coffeeAmount = variation.coffeeAmount * -1
-                data.moneyAmount = data.coffeeAmount * coffeeCost
+
+                const poolCoffeeAmount = await prisma.transaction.aggregate({ where: { poolId: req.body.poolId, type: { in: ["drink", "addCoffee", "useMoney"] } }, _sum: { coffeeAmount: true } })
+                const userMoneyAmount = await prisma.transaction.aggregate({ where: { poolId: req.body.poolId, userId: req.user.id }, _sum: { moneyAmount: true } })
+                if (req.body.coffeeVariation != null) {
+                    const variation = await prisma.coffeeVariation.findFirstOrThrow({ where: { id: req.body.coffeeVariation } })
+                    data.coffeeAmount = variation.coffeeAmount * -1
+                    data.moneyAmount = variation.coffeeAmount * Number(coffeeCost) * -1
+                } else {
+                    data.coffeeAmount = (Math.abs(data.coffeeAmount)) * -1
+                    data.moneyAmount = data.coffeeAmount * Number(coffeeCost)
+                }
+                let hasEnoughCoffee = data.coffeeAmount <= Number(poolCoffeeAmount._sum.coffeeAmount)
+                let hasEnoughMoney = Math.ceil(Number(coffeeCost) * data.coffeeAmount) <= Number(userMoneyAmount._sum.moneyAmount)
+                if (!hasEnoughCoffee) {
+                    return res.status(400).json({ message: "Not enough coffee!" })
+                }
+                if (!hasEnoughMoney) {
+                    return res.status(400).json({ message: "Not enough money!" })
+                }
                 break
             case "addCoffee":
                 data.coffeeAmount = data.coffeeAmount > 0 ? data.coffeeAmount : data.coffeeAmount * -1
@@ -91,6 +112,23 @@ export async function addTransaction(req: Request & Record<string, any>, res: Re
             case "addMoney":
                 data.moneyAmount = data.moneyAmount > 0 ? data.moneyAmount : data.moneyAmount * -1
                 data.coffeeAmount = 0
+                break
+            case "useMoney":
+                const poolMoney = await prisma.transaction.aggregate({ where: { poolId: req.body.poolId, type: { in: ["addMoney", "useUpMoney"] } }, _sum: { moneyAmount: true } })
+                if (Number(poolMoney._sum.moneyAmount) < data.moneyAmount) {
+                    return res.status(400).json({ message: "Pool doesn't have enough funds!!" })
+                }
+                await prisma.transaction.create({
+                    data: {
+                        userId: req.user.id,
+                        poolId: req.body.poolId,
+                        type: "useUpMoney",
+                        moneyAmount: Math.abs(data.moneyAmount) * -1,
+                        coffeeAmount: 0
+                    }
+                })
+                data.moneyAmount = Math.abs(data.moneyAmount)
+                data.coffeeAmount = Math.abs(data.coffeeAmount)
                 break
             default:
                 return res.status(400).json({ message: "Invalid transaction type!" })
@@ -102,7 +140,7 @@ export async function addTransaction(req: Request & Record<string, any>, res: Re
                 type: req.body.type,
                 moneyAmount: data.moneyAmount,
                 coffeeAmount: data.coffeeAmount,
-                coffeeVariationId: req.body.coffeeVariation ? req.body.coffeeVariation : null
+                coffeeVariationId: req.body.coffeeVariation ? req.body.coffeeVariation : undefined
             }
         })
         if (!result) {

@@ -19,6 +19,10 @@ export function HistoryCard(props) {
             color = "var(--success)"
             text = "Added Money"
             break
+        case ("useMoney"):
+            color = "var(--danger)"
+            text = "Used Money"
+            break
         default:
             color = "var(--bg-dark)"
             text = "Unknown"
@@ -33,7 +37,7 @@ export function HistoryCard(props) {
                 </div>
                 <div className="textContainer">
                     <p className="actionText">{text}</p>
-                    <p className="amountText">{props.transaction.type == "drink" ? "-" : "+"}{props.transaction.moneyAmount} Ft {props.transaction.type != "addMoney" ? `(${props.transaction.coffeeAmount}g)` : ""}</p>
+                    <p className="amountText">{props.transaction.moneyAmount} Ft {props.transaction.type != "addMoney" ? `(${props.transaction.coffeeAmount}g)` : ""}</p>
                 </div>
             </div>
             <FontAwesomeIcon icon={faEdit} style={{ margin: "5px", fontSize: "1.1rem" }} />

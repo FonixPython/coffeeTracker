@@ -25,7 +25,8 @@ export interface Balance {
     poolId: string,
     poolName: string,
     coffeeAmount: number | null,
-    moneyBalance: number | null
+    moneyBalance: number | null,
+    poolMoneyOnly: number
 }
 
 export interface Variation {
@@ -137,6 +138,9 @@ export function HomePage() {
                 case "drink":
                     title = "Drink from pool"
                     break
+                case "useMoney":
+                    title = "Use money from pool"
+                    break
                 default:
                     return null
             }
@@ -147,7 +151,6 @@ export function HomePage() {
                     pool={pool}
                     balances={balances}
                     variations={variations}
-                    searchParams={searchParams}
                     setModal={setModal}
                     setModalOpened={setModalOpened}
                     setPool={setPool}
@@ -197,6 +200,10 @@ export function HomePage() {
                     <button className="addMoneyAction" name="addMoney" onClick={handleActionButton}>
                         <FontAwesomeIcon icon={faMoneyBillWave} />
                         Add money
+                    </button>
+                    <button className="useMoneyAction" name="useMoney" onClick={handleActionButton}>
+                        <FontAwesomeIcon icon={faMoneyBillWave} />
+                        Use money
                     </button>
                 </SectionCard>
                 <div className="cardContainer">
