@@ -155,6 +155,10 @@ export async function editUser(req: Request & Record<string, any>, res: Response
             console.log(req.body)
             return res.status(400).json({ message: "Invalid request, must contain all user properties!" })
         }
+        let existsCheck = await prisma.user.findFirst({ where: { username: req.body.username, accepted: true } })
+        if (existsCheck) {
+            return res.status(400).json({ message: "Username already exists!" })
+        }
         let result
         if (req.user.permission == "admin" && req.body.id) {
             result = await prisma.user.update({

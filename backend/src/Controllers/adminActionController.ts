@@ -5,7 +5,7 @@ import { calculateCoffeeCost } from "./userActionController.js";
 
 export async function getAllUsers(req: Request, res: Response) {
     try {
-        const result = await prisma.user.findMany({ include: { transactions: true }, omit: { passwordHash: true } })
+        const result = await prisma.user.findMany({ include: { transactions: { orderBy: { dateOfTransaction: "desc" }, include: { pool: { select: { name: true } } } } }, omit: { passwordHash: true } })
         return res.json({ message: "Successfully retrieved users!", result: result })
     } catch (e) {
         console.log()
@@ -36,7 +36,7 @@ export async function deleteSpecifiedUser(req: Request & Record<string, any>, re
 
 export async function getPools(req: Request, res: Response) {
     try {
-        const result = await prisma.pool.findMany({ include: { transactions: true } })
+        const result = await prisma.pool.findMany({ include: { transactions: { where: { type: { notIn: ["useUpMoney"] } }, orderBy: { dateOfTransaction: "desc" }, include: { user: { select: { username: true } } } } } })
         return res.json({ message: "Successfully retrieved pools!", result: result })
     } catch (e) {
         console.log(e)

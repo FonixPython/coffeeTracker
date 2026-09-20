@@ -15,6 +15,7 @@ export interface Transaction {
     coffeeVariationId: string,
     dateOfTransaction: string,
     user?: User,
+    pool?: Pool,
     edit: boolean
 }
 
@@ -43,7 +44,8 @@ interface AdminTransactionCardProps {
     transaction: Transaction,
     setModalOpened: Function,
     setModal: Function,
-    reload: Function
+    reload: Function,
+    pool: boolean
 }
 
 export function AdminPools({ pools, setModalOpened, setModal, reload }: AdminPoolsProps) {
@@ -129,38 +131,67 @@ function AdminPoolCard({ pool, setModal, setModalOpened, reload }: AdminPoolCard
         </>}>
             <hr />
             {pool.transactions.length > 0 ? pool.transactions.map((transaction) => (
-                <AdminTransactionCard transaction={transaction} setModal={setModal} setModalOpened={setModalOpened} reload={reload} />
+                <AdminTransactionCard transaction={transaction} setModal={setModal} setModalOpened={setModalOpened} reload={reload} pool />
             )) : <p style={{ textAlign: "center", fontWeight: 200, color: "var(--text-muted)", margin: "15px" }}>No transactions yet!</p>}
         </SectionCard>
     )
 }
 
-export function AdminTransactionCard({ transaction, setModal, setModalOpened, reload }: AdminTransactionCardProps) {
+export function AdminTransactionCard({ transaction, setModal, setModalOpened, reload, pool }: AdminTransactionCardProps) {
     let color = ""
     let text = ""
     switch (transaction.type) {
         case ("drink"):
             color = "var(--info)"
-            text = "Drank"
+            text = "drank coffee"
             break
         case ("addCoffee"):
             color = "var(--warning)"
             text = "Drank"
-            text = "Added Coffee"
+            text = "added coffee"
             break
         case ("addMoney"):
             color = "var(--success)"
-            text = "Added Money"
+            text = "added money"
             break
         case ("useMoney"):
             color = "var(--danger)"
-            text = "Used Money"
+            text = "used money"
             break
         default:
             color = "var(--bg-dark)"
-            text = "Unknown"
+            text = "unknown"
             break
     }
+
+
+    async function deleteTransactionAction() {
+        const result = await fetch("/api/deleteTransaction/" + transaction.id, { method: "DELETE" })
+        if (result.ok) {
+            reload()
+            setModalOpened(false)
+            toast.success("Successfully deleted transaction!")
+            setModal({ title: "", elements: <></> })
+        } else {
+            toast.error((await result.json()).message)
+        }
+    }
+
+    async function deleteTransactionModal() {
+        setModal({
+            title: "Delete transaction",
+            elements:
+                <div>
+                    <button className="dangerButton" onClick={deleteTransactionAction}>Delete</button>
+                    <button className="" onClick={() => {
+                        setModalOpened(false)
+                        setModal({ title: "", elements: <></> })
+                    }}>Cancel</button>
+                </div>
+        })
+        setModalOpened(true)
+    }
+
     return (
         <div className="historyCard" key={transaction.id}>
             <div className="left">
@@ -168,11 +199,18 @@ export function AdminTransactionCard({ transaction, setModal, setModalOpened, re
                     <FontAwesomeIcon icon={transaction.type == "addMoney" ? faMoneyBillWave : faCoffee} />
                 </div>
                 <div className="textContainer">
-                    <p className="actionText">{text}</p>
-                    <p className="amountText">{transaction.type == "drink" ? "-" : "+"}{transaction.moneyAmount} Ft {transaction.type != "addMoney" ? `(${transaction.coffeeAmount}g)` : ""}</p>
+                    <p className="actionText">{pool ? `${transaction.user?.username} ` : ""}{text}{!pool ? ` in ${transaction.pool?.name}` : ""}</p>
+                    <p className="amountText">{transaction.moneyAmount} Ft {transaction.type != "addMoney" ? `(${transaction.coffeeAmount}g)` : ""}</p>
                 </div>
             </div>
-            <FontAwesomeIcon icon={faPenToSquare} style={{ margin: "5px", fontSize: "1.1rem" }} />
+            <div>
+                <button className="actionButton" >
+                    <FontAwesomeIcon icon={faPenToSquare} style={{ margin: "5px", fontSize: "1.1rem" }} />
+                </button>
+                <button className="actionButton dangerButton" onClick={deleteTransactionModal}>
+                    <FontAwesomeIcon icon={faTrash} style={{ margin: "5px", fontSize: "1.1rem" }} />
+                </button>
+            </div>
         </div>
     )
 }

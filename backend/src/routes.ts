@@ -25,7 +25,7 @@ router.get("/api/verify", authenticateUser, checkAuth)
 // Actions for users
 
 router.get("/api/getBalances", authenticateUser, getBalances)
-router.get("/api/getTransactions/:poolId", authenticateAdmin, getTransactions)
+router.get("/api/getTransactions/:poolId", authenticateUser, getTransactions)
 router.get("/api/getVariations", authenticateUser, getCoffeeVariations)
 router.post("/api/addTransaction", authenticateUser, addTransaction)
 router.post("/api/editTransaction/:transactionId", authenticateUser, editTransaction)
