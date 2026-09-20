@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPenToSquare, faTrash, faMoneyBillWave, faCoffee } from "@fortawesome/free-solid-svg-icons"
 import { toast } from "sonner"
 import "./AdminPools.css"
+import type { User } from "../AdminUsers/AdminUsers"
 
 export interface Transaction {
     id: string,
@@ -12,7 +13,9 @@ export interface Transaction {
     moneyAmount: number,
     coffeeAmount: number,
     coffeeVariationId: string,
-    dateOfTransaction: string
+    dateOfTransaction: string,
+    user?: User,
+    edit: boolean
 }
 
 export interface Pool {
@@ -148,6 +151,10 @@ export function AdminTransactionCard({ transaction, setModal, setModalOpened, re
         case ("addMoney"):
             color = "var(--success)"
             text = "Added Money"
+            break
+        case ("useMoney"):
+            color = "var(--danger)"
+            text = "Used Money"
             break
         default:
             color = "var(--bg-dark)"

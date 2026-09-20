@@ -208,7 +208,7 @@ export function HomePage() {
                 </SectionCard>
                 <div className="cardContainer">
                     <SectionCard collapseable title="History" wrap={currWidth > 800} currWidth={currWidth}>
-                        {transactions.map((transaction) => (<HistoryCard transaction={transaction} />))}
+                        {transactions.map((transaction) => (<HistoryCard transaction={transaction} balances={balances} getPoolTransactions={getPoolTransactions} loadUserData={loadUserData} setModal={setModal} setModalOpened={setModalOpened} variations={variations} key={transaction.id} />))}
                     </SectionCard>
                     <SectionCard collapseable title="Balances" wrap={currWidth > 800} currWidth={currWidth}>
                         {balances.map((balance) => (<BalanceCard balance={balance} highlighted={balance.poolId == pool} />))}

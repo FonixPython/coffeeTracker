@@ -77,3 +77,9 @@ button {
     scale: 1.03;
     filter: drop-shadow(var(--secondary) 0 0 10px)
 }
+
+
+.dangerButton:hover {
+    border-color: var(--danger) !important;
+    color: var(--danger) !important;
+}

@@ -38,17 +38,18 @@ model Setting {
 }
 
 model Transaction {
-  id                String           @id @default(uuid())
-  userId            String
-  poolId            String
-  type              String
-  moneyAmount       Int
-  coffeeAmount      Int
-  coffeeVariationId String?
-  dateOfTransaction DateTime         @default(now())
-  coffeevariation   CoffeeVariation? @relation(fields: [coffeeVariationId], references: [id])
-  pool              Pool             @relation(fields: [poolId], references: [id])
-  user              User             @relation(fields: [userId], references: [id])
+  id                   String           @id @default(uuid())
+  companyTransactionId String?
+  userId               String
+  poolId               String
+  type                 String
+  moneyAmount          Int
+  coffeeAmount         Int
+  coffeeVariationId    String?
+  dateOfTransaction    DateTime         @default(now())
+  coffeevariation      CoffeeVariation? @relation(fields: [coffeeVariationId], references: [id])
+  pool                 Pool             @relation(fields: [poolId], references: [id])
+  user                 User             @relation(fields: [userId], references: [id])
 }
 
 model CoffeeVariation {

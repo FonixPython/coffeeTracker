@@ -72,9 +72,15 @@ export async function addTransaction(req: Request & Record<string, any>, res: Re
         if (!req.body.poolId == undefined || req.body.moneyAmount == undefined || !req.body.coffeeAmount == undefined || !req.body.type == undefined) {
             return res.status(400).json({ message: "Invalid request!", result: null })
         }
-        const data = {
+        interface DataInterface {
+            coffeeAmount: number,
+            moneyAmount: number,
+            companyTransactionId: string | null
+        }
+        const data: DataInterface = {
             coffeeAmount: req.body.coffeeAmount,
-            moneyAmount: req.body.moneyAmount
+            moneyAmount: req.body.moneyAmount,
+            companyTransactionId: null
         }
         switch (req.body.type) {
             case "drink":
@@ -118,7 +124,7 @@ export async function addTransaction(req: Request & Record<string, any>, res: Re
                 if (Number(poolMoney._sum.moneyAmount) < data.moneyAmount) {
                     return res.status(400).json({ message: "Pool doesn't have enough funds!!" })
                 }
-                await prisma.transaction.create({
+                const companyTransaction = await prisma.transaction.create({
                     data: {
                         userId: req.user.id,
                         poolId: req.body.poolId,
@@ -127,6 +133,7 @@ export async function addTransaction(req: Request & Record<string, any>, res: Re
                         coffeeAmount: 0
                     }
                 })
+                data.companyTransactionId = companyTransaction.id
                 data.moneyAmount = Math.abs(data.moneyAmount)
                 data.coffeeAmount = Math.abs(data.coffeeAmount)
                 break
@@ -140,7 +147,8 @@ export async function addTransaction(req: Request & Record<string, any>, res: Re
                 type: req.body.type,
                 moneyAmount: data.moneyAmount,
                 coffeeAmount: data.coffeeAmount,
-                coffeeVariationId: req.body.coffeeVariation ? req.body.coffeeVariation : undefined
+                coffeeVariationId: req.body.coffeeVariation ? req.body.coffeeVariation : null,
+                companyTransactionId: data.companyTransactionId
             }
         })
         if (!result) {
@@ -157,7 +165,7 @@ export async function addTransaction(req: Request & Record<string, any>, res: Re
 
 export async function editTransaction(req: Request & Record<string, any>, res: Response) {
     try {
-        if (!req.params.transactionId || !req.body.moneyAmount || !req.body.coffeeAmount || !req.body.type || !req.body.coffeeVariation) {
+        if (!req.body.poolId == undefined || req.body.moneyAmount == undefined || !req.body.coffeeAmount == undefined || !req.body.type == undefined) {
             return res.status(400).json({ message: "Invalid request!", result: null })
         }
         const transactionId = Array.isArray(req.params.transactionId) ? req.params.transactionId[0] : req.params.transactionId;
@@ -166,15 +174,34 @@ export async function editTransaction(req: Request & Record<string, any>, res: R
             moneyAmount: req.body.moneyAmount
         }
         const before = await prisma.transaction.findFirstOrThrow({ where: { id: transactionId } })
-        switch (req.body.type) {
+        switch (before.type) {
             case "drink":
-                const coffeeCost = await calculateCoffeeCost(before.poolId)
+                if (!req.body.coffeeVariation == undefined) {
+                    return res.status(400).json({ message: "Invalid request!", result: null })
+                }
+                const coffeeCost = await calculateCoffeeCost(req.body.poolId)
                 if (!coffeeCost) {
                     return res.status(500).json({ message: "No coffee" })
                 }
-                const variation = await prisma.coffeeVariation.findFirstOrThrow({ where: { id: req.body.coffeeVariation } })
-                data.coffeeAmount = variation.coffeeAmount * -1
-                data.moneyAmount = data.coffeeAmount * coffeeCost
+
+                const poolCoffeeAmount = await prisma.transaction.aggregate({ where: { poolId: req.body.poolId, type: { in: ["drink", "addCoffee", "useMoney"] } }, _sum: { coffeeAmount: true } })
+                const userMoneyAmount = await prisma.transaction.aggregate({ where: { poolId: req.body.poolId, userId: req.user.id }, _sum: { moneyAmount: true } })
+                if (req.body.coffeeVariation != null) {
+                    const variation = await prisma.coffeeVariation.findFirstOrThrow({ where: { id: req.body.coffeeVariation } })
+                    data.coffeeAmount = variation.coffeeAmount * -1
+                    data.moneyAmount = variation.coffeeAmount * Number(coffeeCost) * -1
+                } else {
+                    data.coffeeAmount = (Math.abs(data.coffeeAmount)) * -1
+                    data.moneyAmount = data.coffeeAmount * Number(coffeeCost)
+                }
+                let hasEnoughCoffee = req.body.poolId == before.poolId ? (data.coffeeAmount <= Number(poolCoffeeAmount._sum.coffeeAmount) + before.coffeeAmount) : (data.coffeeAmount <= Number(poolCoffeeAmount._sum.coffeeAmount))
+                let hasEnoughMoney = req.body.poolID == before.poolId ? (Math.ceil(Number(coffeeCost) * data.coffeeAmount) <= Number(userMoneyAmount._sum.moneyAmount) + before.moneyAmount) : (Math.ceil(Number(coffeeCost) * data.coffeeAmount) <= Number(userMoneyAmount._sum.moneyAmount))
+                if (!hasEnoughCoffee) {
+                    return res.status(400).json({ message: "Not enough coffee!" })
+                }
+                if (!hasEnoughMoney) {
+                    return res.status(400).json({ message: "Not enough money!" })
+                }
                 break
             case "addCoffee":
                 data.coffeeAmount = data.coffeeAmount > 0 ? data.coffeeAmount : data.coffeeAmount * -1
@@ -183,6 +210,23 @@ export async function editTransaction(req: Request & Record<string, any>, res: R
             case "addMoney":
                 data.moneyAmount = data.moneyAmount > 0 ? data.moneyAmount : data.moneyAmount * -1
                 data.coffeeAmount = 0
+                break
+            case "useMoney":
+                const poolMoney = await prisma.transaction.aggregate({ where: { poolId: req.body.poolId, type: { in: ["addMoney", "useUpMoney"] } }, _sum: { moneyAmount: true } })
+                if (req.body.poolId == before.poolId ? (Number(poolMoney._sum.moneyAmount) + before.moneyAmount < data.moneyAmount) : (Number(poolMoney._sum.moneyAmount) < data.moneyAmount)) {
+                    return res.status(400).json({ message: "Pool doesn't have enough funds!!" })
+                }
+                await prisma.transaction.update({
+                    where: { id: before.companyTransactionId || "" },
+                    data: {
+                        poolId: req.body.poolId,
+                        type: "useUpMoney",
+                        moneyAmount: Math.abs(data.moneyAmount) * -1,
+                        coffeeAmount: 0
+                    }
+                })
+                data.moneyAmount = Math.abs(data.moneyAmount)
+                data.coffeeAmount = Math.abs(data.coffeeAmount)
                 break
             default:
                 return res.status(400).json({ message: "Invalid transaction type!" })
@@ -194,15 +238,16 @@ export async function editTransaction(req: Request & Record<string, any>, res: R
         const result = await prisma.transaction.update({
             where: (req.user.permission == "user") ? { id: transactionId, userId: req.user.id } : { id: transactionId },
             data: {
-                type: req.body.type,
-                coffeeAmount: data.coffeeAmount,
+                poolId: req.body.poolId,
                 moneyAmount: data.moneyAmount,
-                coffeevariation: req.body.coffeeVariation
+                coffeeAmount: data.coffeeAmount,
+                coffeeVariationId: req.body.coffeeVariation ? req.body.coffeeVariation : null,
             }
         })
         if (!result) {
             return res.status(401).json({ message: "Can't edit transaction!" })
         }
+        return res.json({ message: "Successfully edited transaction!" })
     } catch (e) {
         console.log(e)
         return res.status(500).json({ message: "Internal server error!" })
@@ -215,13 +260,19 @@ export async function deleteTransaction(req: Request & Record<string, any>, res:
             return res.status(400).json({ message: "Invalid request!", result: null })
         }
         const transactionId = Array.isArray(req.params.transactionId) ? req.params.transactionId[0] : req.params.transactionId;
+        const before = await prisma.transaction.findFirstOrThrow({ where: { id: transactionId } })
+        if (before?.companyTransactionId) {
+            await prisma.transaction.delete({
+                where: req.user.permission == "user" ? { id: before.companyTransactionId, userId: req.user.id } : { id: before?.companyTransactionId }
+            })
+        }
         const result = await prisma.transaction.delete({
             where: req.user.permission == "user" ? { id: transactionId, userId: req.user.id } : { id: transactionId }
         })
         if (!result) {
             return res.status(401).json({ message: "Can't delete transaction!" })
         }
-        return res.status(401).json({ message: "Successfully deleted transaction!" })
+        return res.json({ message: "Successfully deleted transaction!" })
     } catch (e) {
         console.log(e)
         return res.status(500).json({ message: "Internal server error!" })
