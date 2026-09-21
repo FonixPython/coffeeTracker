@@ -231,7 +231,7 @@ export async function editTransaction(req: Request & Record<string, any>, res: R
             default:
                 return res.status(400).json({ message: "Invalid transaction type!" })
         }
-        if (req.user.permission == "user" && Date.now() - before.dateOfTransaction.getTime() < 1000 * 60 * 60) {
+        if (req.user.permission == "user" && Date.now() - before.dateOfTransaction.getTime() > 1000 * 60 * 60) {
             return res.status(401).json({ message: "Transaction too old to edit!" })
         }
 
