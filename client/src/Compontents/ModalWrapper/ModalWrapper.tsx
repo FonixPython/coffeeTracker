@@ -1,4 +1,3 @@
-import { useState } from "react"
 import "./ModalWrapper.css"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faXmark } from "@fortawesome/free-solid-svg-icons"
@@ -17,7 +16,7 @@ export function ModalWrapper({ title, isopen, setOpen, children }: ModalWrapperP
                     setOpen(false)
                 }
             }}>
-                <div className="modalWrapper" onClick={() => { }}>
+                <div className="modalWrapper" style={{ zIndex: 9999 }} onClick={() => { }}>
                     <div className="titleBar">
                         <p>{title || ""}</p>
                         <button className="closeButton" onClick={() => { setOpen(false) }}><FontAwesomeIcon icon={faXmark} /></button>

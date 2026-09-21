@@ -1,12 +1,13 @@
 import { SectionCard } from "../SectionCard/SectionCard"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPenToSquare, faTrash, faMoneyBillWave, faCoffee } from "@fortawesome/free-solid-svg-icons"
+import { faPenToSquare, faTrash, faMoneyBillWave, faCoffee, faQrcode } from "@fortawesome/free-solid-svg-icons"
 import { toast } from "sonner"
 import "./AdminPools.css"
 import type { User } from "../AdminUsers/AdminUsers"
 import { EditTransactionModal } from "../EditTransactionModal/EditTransactionModal"
 import type { Balance, Variation } from "../../Pages/Home/Home"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import QRCode from "qrcode"
 
 export interface Transaction {
     id: string,
@@ -130,8 +131,52 @@ function AdminPoolCard({ pool, setModal, setModalOpened, reload, variations }: A
         setModalOpened(true)
     }
 
+    function QrCode({ text }: { text: string }) {
+        const canvasRef = useRef<HTMLCanvasElement | null>(null)
+
+        useEffect(() => {
+            if (!canvasRef.current) return
+            QRCode.toCanvas(canvasRef.current, text, {
+                width: 256,
+                margin: 2,
+                errorCorrectionLevel: "H",
+                color: { dark: "#000000", light: "#FFFFFF" },
+            })
+        }, [text])
+
+        return (
+            <div>
+                <canvas ref={canvasRef}></canvas>
+            </div>
+        )
+    }
+
+    async function showQr() {
+        const url = `${window.location.origin}/?pool=${pool.id}`
+        async function downloadQr() {
+            const dataUrl = await QRCode.toDataURL(url, { width: 1024, margin: 2, errorCorrectionLevel: "H" })
+            const a = document.createElement("a")
+            a.href = dataUrl
+            a.download = `${pool.name}_QR.png`
+            a.click()
+
+        }
+        setModal({
+            title: "QR",
+            elements:
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
+                    <div style={{ backgroundColor: "#FFFFFF", borderRadius: "10px", padding: "5px", margin: "30px" }}>
+                        <QrCode text={url} />
+                    </div>
+                    <button className="actionButton" onClick={downloadQr}>Download</button>
+                </div>
+        })
+        setModalOpened(true)
+    }
+
     return (
         <SectionCard key={pool.id} title={pool.name} collapseable={true} headerChildren={<>
+            <button className="actionButton" onClick={showQr}>Show QR <FontAwesomeIcon icon={faQrcode} /></button>
             <button className="actionButton" onClick={editPoolModal}>Edit <FontAwesomeIcon icon={faPenToSquare} /></button>
             <button className="actionButton dangerButton" onClick={deletePoolModal}>Delete <FontAwesomeIcon icon={faTrash} /></button>
         </>}>
