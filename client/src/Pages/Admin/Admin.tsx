@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPenToSquare, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons"
 import { AdminUsers, type User } from "../../Compontents/AdminUsers/AdminUsers"
 import { TopBar } from "../../Compontents/TopBar/TopBar"
+import { Charts } from "../../Compontents/Charts/Charts"
 
 export function AdminPage() {
     const [modalOpened, setModalOpened] = useState<boolean>(false)
@@ -306,6 +307,9 @@ export function AdminPage() {
                 }>
                     <hr />
                     <AdminUsers users={users} setModal={setModal} setModalOpened={setModalOpened} reload={loadUsers} variations={variations} />
+                </SectionCard>
+                <SectionCard title="Statistics" collapseable>
+                    <Charts pools={pools || []} />
                 </SectionCard>
             </main>
         </>
