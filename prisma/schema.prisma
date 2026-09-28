@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id                 String        @id @default(uuid())
+  username           String        @unique
+  passwordHash       String
+  accepted           Boolean       @default(false)
+  admin              Boolean       @default(false)
+  dateOfRegistration DateTime      @default(now())
+  tokens             Token[]
+  transactions       Transaction[]
+}
+
+model Token {
+  id          String   @id @default(uuid())
+  userId      String
+  userAgent   String
+  dateOfLogin DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model Pool {
+  id             String        @id @default(uuid())
+  name           String        @unique
+  dateOfCreation DateTime      @default(now())
+  transactions   Transaction[]
+}
+
+model Setting {
+  key  String @id
+  data String
+}
+
+model Transaction {
+  id                   String           @id @default(uuid())
+  companyTransactionId String?
+  userId               String
+  poolId               String
+  type                 String
+  moneyAmount          Int
+  coffeeAmount         Int
+  coffeeVariationId    String?
+  dateOfTransaction    DateTime         @default(now())
+  coffeevariation      CoffeeVariation? @relation(fields: [coffeeVariationId], references: [id])
+  pool                 Pool             @relation(fields: [poolId], references: [id])
+  user                 User             @relation(fields: [userId], references: [id])
+}
+
+model CoffeeVariation {
+  id           String        @id
+  coffeeAmount Int
+  transactions Transaction[]
+}
