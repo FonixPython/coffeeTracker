@@ -1,7 +1,7 @@
 {
-  "name": "web-radio",
+  "name": "coffeeTracker",
   "version": "1.0.0",
-  "description": "A simple web radio with an admin interface, that streams music 24/7 written for Node",
+  "description": "Coffee tracking app for a simple office environment",
   "main": "index.js",
   "scripts": {
     "build:frontend": "cd client && vite build",
@@ -13,16 +13,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/FonixPython/Web-Radio.git"
+    "url": "git+https://github.com/FonixPython/coffeeTracker.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "bugs": {
-    "url": "https://github.com/FonixPython/Web-Radio/issues"
+    "url": "https://github.com/FonixPython/coffeeTracker/issues"
   },
-  "homepage": "https://github.com/FonixPython/Web-Radio#readme",
+  "homepage": "https://github.com/FonixPython/coffeeTracker#readme",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.3.1",
     "@fortawesome/free-brands-svg-icons": "^7.3.1",

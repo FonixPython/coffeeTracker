@@ -1,0 +1,42 @@
+.historyCard {
+    background-color: var(--bg-light);
+    border: 2px solid var(--border);
+    margin: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    height: 60px;
+    border-radius: 10px;
+}
+
+.historyCard .left {
+    display: flex;
+    flex-direction: row;
+}
+
+.historyCard .iconCircle {
+    height: 50px;
+    width: 50px;
+    margin: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    border-radius: 100%;
+    user-select: none;
+}
+
+.historyCard .textContainer {
+    margin: 5px;
+}
+
+.historyCard .actionText {
+    font-size: 1rem;
+    font-weight: 250;
+}
+
+.historyCard .amountText {
+    font-size: 1.5rem;
+    font-weight: 450;
+}

@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Pixelify+Sans:wght@400..700&display=swap');
+
+
+body {
+    background-color: var(--bg);
+}
+
+* {
+    font-family: 'Inter';
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+}
+
+input {
+    background-color: var(--bg-light);
+    color: var(--text);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 1.2rem;
+    margin: 5px;
+    outline: none;
+    transition: 0.1s;
+}
+
+input[type="submit"] {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+input:hover {
+    border-color: var(--secondary);
+    background-color: color-mix(in srgb, var(--bg-light) 100%, var(--secondary) 30%);
+    scale: 1.05;
+}
+
+input:focus {
+    border-color: var(--secondary);
+    background-color: color-mix(in srgb, var(--bg-light) 100%, var(--secondary) 30%);
+    scale: 1.05
+}
+
+
+input:active[type="submit"] {
+    scale: 1.15;
+}
+
+button {
+    margin: 5px 5px;
+    background-color: var(--bg-light);
+    border: 2px solid var(--border);
+    padding: 5px;
+    border-radius: 10px;
+    color: var(--text);
+    text-align: center;
+    font-size: 1rem;
+    display: inline-block;
+}
+
+.profilePicture {
+    height: 50px;
+    width: 50px;
+    border-radius: 100%;
+    margin: 5px;
+    object-fit: cover;
+    overflow: hidden;
+}
+
+.profilePictureSelector {
+    height: 150px;
+    width: 150px;
+    transition: 0.1s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.profilePictureSelector:hover {
+    scale: 1.03;
+    filter: drop-shadow(var(--secondary) 0 0 10px)
+}
+
+
+.dangerButton:hover {
+    border-color: var(--danger) !important;
+    color: var(--danger) !important;
+}
