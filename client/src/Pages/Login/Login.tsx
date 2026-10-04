@@ -29,13 +29,13 @@ export function LoginPage({ permission }: LoginPageProps) {
                     document.location.reload()
                     break
                 case 403:
-                    toast.error("Your account is not approved! Please wait for approval from an administrator!")
+                    toast.error("A fiókod még nincs elfogadva! Szólj egy adminisztrátornak!")
                     break
                 case 401:
-                    toast.error("Unauthorized! Incorrect username or password!")
+                    toast.error("Hibás felhasználónév vagy jelszó!")
                     break
                 default:
-                    toast.error("Unknown error!")
+                    toast.error("Ismeretlen hiba!")
                     break
             }
         } else {
@@ -48,15 +48,15 @@ export function LoginPage({ permission }: LoginPageProps) {
             })
             switch (result.status) {
                 case 200:
-                    toast.error("Your account is not approved! Please wait for approval from an administrator!")
+                    toast.error("A fiókod még nincs elfogadva! Szólj egy adminisztrátornak!")
                     setMode("login")
                     break
                 case 409:
                     setMode("login")
-                    toast.error("User already exists!")
+                    toast.error("Felhasználónév már létezik!")
                     break
                 default:
-                    toast.error("Unknown error!")
+                    toast.error("Ismeretlen hiba!")
                     break
             }
         }
@@ -75,11 +75,11 @@ export function LoginPage({ permission }: LoginPageProps) {
                 <div className={`loginBox ${mode}`}>
                     <p>coffeeTracker</p>
                     <form onSubmit={login}>
-                        <input type="username" name="username" placeholder="Username" required={true} />
-                        <input type="password" name="password" placeholder="Password" required={true} />
-                        <input type="submit" value={mode == "login" ? "Login" : "Register"} />
+                        <input type="username" name="username" placeholder="Felhasználónév" required={true} />
+                        <input type="password" name="password" placeholder="Jelszó" required={true} />
+                        <input type="submit" value={mode == "login" ? "Bejelentkezés" : "Regisztrálás"} />
                         or
-                        <p className="modeSwitcher" onClick={() => (setMode(mode == "login" ? "register" : "login"))}>{mode == "login" ? "Register" : "Login"}</p>
+                        <p className="modeSwitcher" onClick={() => (setMode(mode == "login" ? "register" : "login"))}>{mode == "login" ? "Regisztrálás" : "Bejelentkezés"}</p>
                     </form>
                 </div>
             </main>

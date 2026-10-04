@@ -13,7 +13,7 @@ export function BalanceCard({ balance, highlighted }: BalanceCardProps) {
             <p className="machineName">{balance.poolName}</p>
             <hr />
             <p className="userBalance">{formatMoney(balance.moneyBalance || 0)}</p>
-            <p className="coffeeBalance">{formatWeight(balance.coffeeAmount || 0)} of beans</p>
+            <p className="coffeeBalance">{formatWeight(balance.coffeeAmount || 0)}-nyi kávé</p>
         </div>
     )
 }

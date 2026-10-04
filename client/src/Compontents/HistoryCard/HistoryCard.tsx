@@ -22,30 +22,29 @@ export function HistoryCard({ transaction, setModal, setModalOpened, loadUserDat
     switch (transaction.type) {
         case ("drink"):
             color = "var(--info)"
-            text = "Drank"
+            text = "Ivás"
             break
         case ("addCoffee"):
             color = "var(--warning)"
-            text = "Drank"
-            text = "Added Coffee"
+            text = "Kávé hozzádás"
             break
         case ("addMoney"):
             color = "var(--success)"
-            text = "Added Money"
+            text = "Pénz hozzáadás"
             break
         case ("useMoney"):
             color = "var(--danger)"
-            text = "Used Money"
+            text = "Pénz felhasznlása"
             break
         default:
             color = "var(--bg-dark)"
-            text = "Unknown"
+            text = "Ismeretlen tevékenység"
             break
     }
 
     async function editTransaction() {
         setModal({
-            title: "Edit transaction",
+            title: "Tranzakció szerkesztése",
             elements: <EditTransactionModal
                 transaction={transaction}
                 balances={balances}
@@ -65,7 +64,7 @@ export function HistoryCard({ transaction, setModal, setModalOpened, loadUserDat
             loadUserData()
             setModalOpened(false)
             getPoolTransactions()
-            toast.success("Successfully deleted transaction!")
+            toast.success("Tranzakció sikeresen törlésre került!")
             setModal({ title: "", elements: <></> })
         } else {
             toast.error((await result.json()).message)
@@ -74,14 +73,14 @@ export function HistoryCard({ transaction, setModal, setModalOpened, loadUserDat
 
     async function deleteTransactionModal() {
         setModal({
-            title: "Delete transaction",
+            title: "Tranzakció törlése",
             elements:
                 <div>
-                    <button className="dangerButton" onClick={deleteTransactionAction}>Delete</button>
+                    <button className="dangerButton" onClick={deleteTransactionAction}>Törlés</button>
                     <button className="" onClick={() => {
                         setModalOpened(false)
                         setModal({ title: "", elements: <></> })
-                    }}>Cancel</button>
+                    }}>Mégse</button>
                 </div>
         })
         setModalOpened(true)

@@ -34,7 +34,7 @@ export function EditTransactionModal({ transaction, setModal, setModalOpened, ba
             loadUserData()
             setModalOpened(false)
             setModal({ title: "", elements: <></> })
-            toast.success("Successfully edited transaction!")
+            toast.success("Tranzakció sikeresen szerkesztésre került!")
             getPoolTransactions()
         } else {
             const resultJson = await result.json()
@@ -64,7 +64,7 @@ export function EditTransactionModal({ transaction, setModal, setModalOpened, ba
             loadUserData()
             setModalOpened(false)
             setModal({ title: "", elements: <></> })
-            toast.success("Successfully edited transaction!")
+            toast.success("Tranzakció sikeresen szerkesztésre került!")
             getPoolTransactions()
         } else {
             const resultJson = await result.json()
@@ -92,7 +92,7 @@ export function EditTransactionModal({ transaction, setModal, setModalOpened, ba
         if (result.ok) {
             setModalOpened(false)
             setModal({ title: "", elements: <></> })
-            toast.success("Successfully edited transaction!")
+            toast.success("Tranzakció sikeresen szerkesztésre került!")
             loadUserData()
             getPoolTransactions()
         } else {
@@ -119,7 +119,7 @@ export function EditTransactionModal({ transaction, setModal, setModalOpened, ba
             const resultJson = await result.json()
             setAvgCost(resultJson.result)
         } else {
-            toast.error("Error loading avarage coffee cost for this pool!")
+            toast.error("Hiba a kávé átlagárának betöltésekor!")
         }
     }
 
@@ -145,7 +145,7 @@ export function EditTransactionModal({ transaction, setModal, setModalOpened, ba
         if (result.ok) {
             setModalOpened(false)
             setModal({ title: "", elements: <></> })
-            toast.success("Successfully edited transaction!")
+            toast.success("Tranzakció sikeresen szerkesztésre került!")
             loadUserData()
             getPoolTransactions()
         } else {
@@ -165,7 +165,7 @@ export function EditTransactionModal({ transaction, setModal, setModalOpened, ba
             return (
                 <form className="newTransactionForm" action="" onSubmit={addCoffeeAction}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                        <p>Pool: </p>
+                        <p>Medence: </p>
                         <select defaultValue={transaction.poolId || ""} onChange={(e) => {
                             const newPool = e.target.value
                             setSelectedPool(newPool)
@@ -174,19 +174,19 @@ export function EditTransactionModal({ transaction, setModal, setModalOpened, ba
                         </select>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                        <p>Amount of coffee:</p>
-                        <input type="number" required name="coffeeAmount" defaultValue={transaction.coffeeAmount} placeholder="Weight in gramms" />
+                        <p>Kávé mennyisége:</p>
+                        <input type="number" required name="coffeeAmount" defaultValue={transaction.coffeeAmount} placeholder="Súly grammban" />
                     </div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                        <p>Cost of coffee:</p>
-                        <input type="number" required name="moneyAmount" defaultValue={transaction.moneyAmount} placeholder="Cost in HUF" />
+                        <p>Kávé ára:</p>
+                        <input type="number" required name="moneyAmount" defaultValue={transaction.moneyAmount} placeholder="Érték forintban" />
                     </div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                        <input type="submit" value="Save" style={{ width: "100%", margin: "3px" }} />
+                        <input type="submit" value="Mentés" style={{ width: "100%", margin: "3px" }} />
                         <input type="button" className="dangerButton" style={{ width: "100%", margin: "3px" }} onClick={() => {
                             setModalOpened(false)
                             setModal({ title: "", elements: <></> })
-                        }} value="Cancel" />
+                        }} value="Mégse" />
                     </div>
                 </form>
             )
@@ -194,7 +194,7 @@ export function EditTransactionModal({ transaction, setModal, setModalOpened, ba
             return (
                 <form className="newTransactionForm" action="" onSubmit={useMoneyAction}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                        <p>Pool: </p>
+                        <p>Medence: </p>
                         <select defaultValue={transaction.poolId || ""} onChange={(e) => {
                             const newPool = e.target.value
                             setSelectedPool(newPool)
@@ -203,22 +203,22 @@ export function EditTransactionModal({ transaction, setModal, setModalOpened, ba
                         </select>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                        <p>Amount of coffee:</p>
-                        <input type="number" required name="coffeeAmount" defaultValue={transaction.coffeeAmount} placeholder="Weight in gramms" />
+                        <p>Kávé mennyisége:</p>
+                        <input type="number" required name="coffeeAmount" defaultValue={transaction.coffeeAmount} placeholder="Súly grammban" />
                     </div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                        <p>Money used:</p>
-                        <input type="number" required name="moneyAmount" defaultValue={transaction.moneyAmount} onChange={(e) => { setMoneyAmount(Number(e.target.value)) }} placeholder="Cost in HUF" />
+                        <p>Pénz felhasználva:</p>
+                        <input type="number" required name="moneyAmount" defaultValue={transaction.moneyAmount} onChange={(e) => { setMoneyAmount(Number(e.target.value)) }} placeholder="Érték forintban" />
                     </div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                        <p style={!canUse ? { color: "var(--danger)" } : {}}><strong>Money left:</strong>{transaction.poolId == selectedPool ? Number(selectedBalance?.poolMoneyOnly) + transaction.moneyAmount - moneyAmount : Number(selectedBalance?.poolMoneyOnly) - moneyAmount} Ft</p>
+                        <p style={!canUse ? { color: "var(--danger)" } : {}}><strong>Maradék pénz:</strong>{transaction.poolId == selectedPool ? Number(selectedBalance?.poolMoneyOnly) + transaction.moneyAmount - moneyAmount : Number(selectedBalance?.poolMoneyOnly) - moneyAmount} Ft</p>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                        <input type="submit" className={!canUse ? "dangerButton" : ""} value="Save" style={{ width: "100%", margin: "3px" }} disabled={!canUse} />
+                        <input type="submit" className={!canUse ? "dangerButton" : ""} value="Mentés" style={{ width: "100%", margin: "3px" }} disabled={!canUse} />
                         <input type="button" className={canUse ? "dangerButton" : ""} style={{ width: "100%", margin: "3px" }} onClick={() => {
                             setModalOpened(false)
                             setModal({ title: "", elements: <></> })
-                        }} value="Cancel" />
+                        }} value="Mégse" />
                     </div>
                 </form>
             )
@@ -226,7 +226,7 @@ export function EditTransactionModal({ transaction, setModal, setModalOpened, ba
             return (
                 <form className="newTransactionForm" action="" onSubmit={addMoneyAction}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                        <p>Pool: </p>
+                        <p>Medence: </p>
                         <select defaultValue={transaction.poolId || ""} onChange={(e) => {
                             const newPool = e.target.value
                             setSelectedPool(newPool)
@@ -234,13 +234,13 @@ export function EditTransactionModal({ transaction, setModal, setModalOpened, ba
                             {balances.map((balance) => (<option key={balance.poolId} value={balance.poolId}>{balance.poolName}</option>))}
                         </select>
                     </div>
-                    <input type="number" required name="moneyAmount" defaultValue={transaction.moneyAmount} placeholder="Cost in HUF" />
+                    <input type="number" required name="moneyAmount" defaultValue={transaction.moneyAmount} placeholder="Érték forintban" />
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                        <input type="submit" value="Save" style={{ width: "100%", margin: "3px" }} />
+                        <input type="submit" value="Mentés" style={{ width: "100%", margin: "3px" }} />
                         <input type="button" className="dangerButton" style={{ width: "100%", margin: "3px" }} onClick={() => {
                             setModalOpened(false)
                             setModal({ title: "", elements: <></> })
-                        }} value="Cancel" />
+                        }} value="Mégse" />
                     </div>
                 </form>
             )
@@ -248,7 +248,7 @@ export function EditTransactionModal({ transaction, setModal, setModalOpened, ba
             return (
                 <form className="newTransactionForm" action="" onSubmit={drinkAction}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                        <p>Pool: </p>
+                        <p>Medence: </p>
                         <select defaultValue={transaction.poolId || ""} onChange={(e) => {
                             const newPool = e.target.value
                             getAvgCost(newPool)
@@ -258,7 +258,7 @@ export function EditTransactionModal({ transaction, setModal, setModalOpened, ba
                         </select>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                        <p>Variation: </p>
+                        <p>Variáció: </p>
                         <select className="machineName" required name="variation" defaultValue={transaction.coffeeVariationId != null ? transaction.coffeeVariationId : "customVariationValue"} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                             if (e.target.value !== "customVariationValue") {
                                 setCustomVariation(false)
@@ -268,24 +268,24 @@ export function EditTransactionModal({ transaction, setModal, setModalOpened, ba
                             }
                         }}>
                             {variations.map((variation) => (<option key={variation.id} value={variation.id}>{variation.id}</option>))}
-                            <option onClick={() => { setCustomVariation(true) }} value="customVariationValue">Custom</option>
+                            <option onClick={() => { setCustomVariation(true) }} value="customVariationValue">Egyéni</option>
                         </select>
                     </div>
                     {customVariation &&
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                            <p>Amount of coffee:</p>
+                            <p>Kávé mennyisége:</p>
                             <input type="number" required name="coffeeAmount" defaultValue={Math.abs(transaction.coffeeAmount)} style={{ width: "100px" }} onChange={(e) => { setCoffeeAmount(Number(e.target.value)) }} />
                         </div>
                     }
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                        <p style={!canDrink ? { color: "var(--danger)" } : {}}><strong>Estimated cost:</strong> ~{Math.abs(Math.ceil(avgCost * coffeeAmount))} Ft</p>
+                        <p style={!canDrink ? { color: "var(--danger)" } : {}}><strong>Becsült érték:</strong> ~{Math.abs(Math.ceil(avgCost * coffeeAmount))} Ft</p>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                        <input type="submit" className={!canDrink ? "dangerButton" : ""} value="Save" style={{ width: "100%", margin: "3px" }} disabled={!canDrink} />
+                        <input type="submit" className={!canDrink ? "dangerButton" : ""} value="Mentés" style={{ width: "100%", margin: "3px" }} disabled={!canDrink} />
                         <input type="button" className={canDrink ? "dangerButton" : ""} style={{ width: "100%", margin: "3px" }} onClick={() => {
                             setModalOpened(false)
                             setModal({ title: "", elements: <></> })
-                        }} value="Cancel" />
+                        }} value="Mégse" />
                     </div>
                 </form>
             )

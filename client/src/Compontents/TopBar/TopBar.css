@@ -40,7 +40,7 @@
 }
 
 .dropDownMenu {
-    width: 150px;
+    width: 200px;
     background-color: var(--bg-light);
     border: 2px solid var(--border);
     border-radius: 10px;

@@ -18,10 +18,10 @@ export function TopBar({ user, setModal, setModalOpened, reload }: TopBarProps) 
     async function logout() {
         const result = await fetch("/api/logout")
         if (result.ok) {
-            toast.success("Successfully logged out!")
+            toast.success("Sikeresen kijelentkezve!")
             document.location.reload()
         } else {
-            toast.error("Failed to logout of session!")
+            toast.error("Hiba a kijelentkezéskor!")
         }
     }
 
@@ -51,13 +51,13 @@ export function TopBar({ user, setModal, setModalOpened, reload }: TopBarProps) 
                 <div className="dropDownMenu">
                     {user.permission == "admin" &&
                         <>
-                            <Link to="/admin" style={{ textDecoration: "none" }}><button className="navButton">Admin</button></Link>
+                            <Link to="/admin" style={{ textDecoration: "none" }}><button className="navButton">Vezérlőpult</button></Link>
                             <br />
                         </>
                     }
-                    <button className="navButton" onClick={editUserModal}>Edit profile</button>
+                    <button className="navButton" onClick={editUserModal}>Profil szerkesztése</button>
                     <hr />
-                    <button className="dangerButton navButton" onClick={logout}>Logout<FontAwesomeIcon icon={faRightFromBracket} /></button>
+                    <button className="dangerButton navButton" onClick={logout}>Kijelentkezés<FontAwesomeIcon icon={faRightFromBracket} /></button>
                 </div>
             </div>
         }
