@@ -25,7 +25,8 @@
 .homePage .actionContainer button {
     margin: 10px;
     margin-bottom: 0;
-    height: 100px;
+    min-height: 100px;
+    padding: 10px;
     border: 0;
     border-radius: 10px;
     font-size: 3rem;

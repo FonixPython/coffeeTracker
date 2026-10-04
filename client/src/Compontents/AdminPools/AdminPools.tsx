@@ -72,7 +72,7 @@ function AdminPoolCard({ pool, setModal, setModalOpened, reload, variations }: A
         if (result.ok) {
             reload()
             setModalOpened(false)
-            toast.success("Successfully deleted pool!")
+            toast.success("Medence sikeresen törlésre került!")
             setModal({ title: "", elements: <></> })
         } else {
             toast.error((await result.json()).message)
@@ -81,14 +81,14 @@ function AdminPoolCard({ pool, setModal, setModalOpened, reload, variations }: A
 
     function deletePoolModal() {
         setModal({
-            title: "Confirm pool deletion",
+            title: "Medence törlésének megerősítése",
             elements:
                 <div>
-                    <button className="actionButton dangerButton" onClick={deletePoolAction}>Delete</button>
+                    <button className="actionButton dangerButton" onClick={deletePoolAction}>Törlés</button>
                     <button className="actionButton" onClick={() => {
                         setModalOpened(false)
                         setModal({ title: "", elements: <></> })
-                    }}>Cancel</button>
+                    }}>Mégse</button>
                 </div>
         })
         setModalOpened(true)
@@ -117,12 +117,12 @@ function AdminPoolCard({ pool, setModal, setModalOpened, reload, variations }: A
 
     function editPoolModal() {
         setModal({
-            title: "Edit pool name",
+            title: "Medence nevének szerkesztése",
             elements:
                 <form action="" onSubmit={editPoolAction}>
                     <input type="text" defaultValue={pool.name} name="name" />
-                    <input type="submit" value="Change" />
-                    <input type="button" className="dangerButton" value="Cancel" onClick={() => {
+                    <input type="submit" value="Mentés" />
+                    <input type="button" className="dangerButton" value="Mégse" onClick={() => {
                         setModalOpened(false)
                         setModal({ title: "", elements: <></> })
                     }} />
@@ -152,7 +152,7 @@ function AdminPoolCard({ pool, setModal, setModalOpened, reload, variations }: A
     }
 
     async function showQr() {
-        const url = `${window.location.origin}/?pool=${pool.id}`
+        const url = `${window.location.origin}/#/?pool=${pool.id}`
         async function downloadQr() {
             const dataUrl = await QRCode.toDataURL(url, { width: 1024, margin: 2, errorCorrectionLevel: "H" })
             const a = document.createElement("a")
@@ -168,7 +168,7 @@ function AdminPoolCard({ pool, setModal, setModalOpened, reload, variations }: A
                     <div style={{ backgroundColor: "#FFFFFF", borderRadius: "10px", padding: "5px", margin: "30px" }}>
                         <QrCode text={url} />
                     </div>
-                    <button className="actionButton" onClick={downloadQr}>Download</button>
+                    <button className="actionButton" onClick={downloadQr}>Letöltés</button>
                 </div>
         })
         setModalOpened(true)
@@ -176,14 +176,14 @@ function AdminPoolCard({ pool, setModal, setModalOpened, reload, variations }: A
 
     return (
         <SectionCard key={pool.id} title={pool.name} collapseable={true} headerChildren={<>
-            <button className="actionButton" onClick={showQr}>Show QR <FontAwesomeIcon icon={faQrcode} /></button>
-            <button className="actionButton" onClick={editPoolModal}>Edit <FontAwesomeIcon icon={faPenToSquare} /></button>
-            <button className="actionButton dangerButton" onClick={deletePoolModal}>Delete <FontAwesomeIcon icon={faTrash} /></button>
+            <button className="actionButton" onClick={showQr}>QR megjelenítése<FontAwesomeIcon icon={faQrcode} /></button>
+            <button className="actionButton" onClick={editPoolModal}>Szerkesztés <FontAwesomeIcon icon={faPenToSquare} /></button>
+            <button className="actionButton dangerButton" onClick={deletePoolModal}>Törlés <FontAwesomeIcon icon={faTrash} /></button>
         </>}>
             <hr />
             {pool.transactions.length > 0 ? pool.transactions.map((transaction) => (
                 <AdminTransactionCard transaction={transaction} setModal={setModal} setModalOpened={setModalOpened} reload={reload} pool variations={variations} />
-            )) : <p style={{ textAlign: "center", fontWeight: 200, color: "var(--text-muted)", margin: "15px" }}>No transactions yet!</p>}
+            )) : <p style={{ textAlign: "center", fontWeight: 200, color: "var(--text-muted)", margin: "15px" }}>Még nincsenek tranzakciók!</p>}
         </SectionCard>
     )
 }
@@ -205,30 +205,29 @@ export function AdminTransactionCard({ transaction, setModal, setModalOpened, re
     switch (transaction.type) {
         case ("drink"):
             color = "var(--info)"
-            text = "drank coffee"
+            text = "kávét ivott"
             break
         case ("addCoffee"):
             color = "var(--warning)"
-            text = "Drank"
-            text = "added coffee"
+            text = "kávét adott hozzá"
             break
         case ("addMoney"):
             color = "var(--success)"
-            text = "added money"
+            text = "pénzt adott hozzá"
             break
         case ("useMoney"):
             color = "var(--danger)"
-            text = "used money"
+            text = "pénzt használt fel"
             break
         default:
             color = "var(--bg-dark)"
-            text = "unknown"
+            text = "ismeretlen akciót hajtott végre"
             break
     }
 
     async function editTransaction() {
         setModal({
-            title: "Edit transaction",
+            title: "Tranzakció szerkesztése",
             elements: <EditTransactionModal
                 transaction={transaction}
                 balances={balances}
@@ -247,7 +246,7 @@ export function AdminTransactionCard({ transaction, setModal, setModalOpened, re
         if (result.ok) {
             reload()
             setModalOpened(false)
-            toast.success("Successfully deleted transaction!")
+            toast.success("Tranzakció sikeresen törlésre került!")
             setModal({ title: "", elements: <></> })
         } else {
             toast.error((await result.json()).message)
@@ -256,14 +255,14 @@ export function AdminTransactionCard({ transaction, setModal, setModalOpened, re
 
     async function deleteTransactionModal() {
         setModal({
-            title: "Delete transaction",
+            title: "Tranzakció törlése",
             elements:
                 <div>
-                    <button className="dangerButton" onClick={deleteTransactionAction}>Delete</button>
+                    <button className="dangerButton" onClick={deleteTransactionAction}>Törlés</button>
                     <button className="" onClick={() => {
                         setModalOpened(false)
                         setModal({ title: "", elements: <></> })
-                    }}>Cancel</button>
+                    }}>Mégse</button>
                 </div>
         })
         setModalOpened(true)

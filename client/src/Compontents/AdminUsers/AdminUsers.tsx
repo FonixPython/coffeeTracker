@@ -65,7 +65,7 @@ export function EditUserForm({ user, setModalOpened, setModal, reload, adminPane
         if (result.ok) {
             reload()
             setModalOpened(false)
-            toast.success("User " + user.username + " edited successfully!")
+            toast.success(user.username + " sikeresen szerkesztve!")
             setModal({ title: "", elements: <></> })
         } else {
             toast.error((await result.json()).message)
@@ -79,7 +79,7 @@ export function EditUserForm({ user, setModalOpened, setModal, reload, adminPane
         const password = data.get("password")
         const password_again = data.get("password-again")
         if (password !== password_again) {
-            toast.error("The new password doesn't match!")
+            toast.error("Az új jelszavak nem egyeznek!")
             return null
         }
         const result = await fetch("/api/changePassword", {
@@ -92,7 +92,7 @@ export function EditUserForm({ user, setModalOpened, setModal, reload, adminPane
         if (result.ok) {
             reload()
             setModalOpened(false)
-            toast.success("Password of user  " + user.username + " successfully changed!")
+            toast.success(user.username + " jelszava sikeresen megváltoztatásra került!")
             setModal({ title: "", elements: <></> })
         } else {
             toast.error((await result.json()).message)
@@ -115,7 +115,7 @@ export function EditUserForm({ user, setModalOpened, setModal, reload, adminPane
         if (result.ok) {
             reload()
             setPfpVersion(Date.now())
-            toast.success("Profile picture of user  " + user.username + " successfully changed!")
+            toast.success(user.username + " profilikonja sikeresen szerkesztésre került!")
         } else {
             toast.error((await result.json()).message)
         }
@@ -127,7 +127,7 @@ export function EditUserForm({ user, setModalOpened, setModal, reload, adminPane
         if (result.ok) {
             reload()
             setPfpVersion(Date.now())
-            toast.success("Profile picture of user  " + user.username + " successfully removed!")
+            toast.success(user.username + " profilikonja sikeresen törlésre került!")
         } else {
             toast.error((await result.json()).message)
         }
@@ -141,15 +141,15 @@ export function EditUserForm({ user, setModalOpened, setModal, reload, adminPane
             </div>
             <input type="file" ref={pfpInputRef} hidden accept="image/*" onChange={uploadProfilePicture} />
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                Username:<input type="text" name="username" placeholder="Username" defaultValue={user.username} />
+                Felhasználónév:<input type="text" name="username" placeholder="Felhasználónév" defaultValue={user.username} />
             </div>
             {adminPanel &&
                 <>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                        Admin:<input type="checkbox" name="admin" defaultChecked={user.admin} />
+                        Adminisztrátor:<input type="checkbox" name="admin" defaultChecked={user.admin} />
                     </div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                        Accepted: <input type="checkbox" name="accepted" defaultChecked={user.accepted} />
+                        Elfogadva: <input type="checkbox" name="accepted" defaultChecked={user.accepted} />
                     </div>
                 </>
             }
@@ -157,23 +157,23 @@ export function EditUserForm({ user, setModalOpened, setModal, reload, adminPane
                 {chPw ? (
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%", backgroundColor: "var(--bg-dark)", border: "2px solid var(--border)", borderRadius: "10px" }} >
                         <p>Change password</p>
-                        <input type="password" placeholder="Password" name="password" />
-                        <input type="password" placeholder="Password again" name="password-again" />
+                        <input type="password" placeholder="Jelszó" name="password" />
+                        <input type="password" placeholder="Jelszó" name="password-again" />
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                            <input type="button" className="dangerButton" value="Save password" onClick={changeUserPassword} />
-                            <input type="button" onClick={() => { setChPw(false) }} value="Cancel" />
+                            <input type="button" className="dangerButton" value="Jelszó mentése" onClick={changeUserPassword} />
+                            <input type="button" onClick={() => { setChPw(false) }} value="Mégse" />
                         </div>
                     </div>
                 ) : (
-                    <button type="button" className="actionButton" onClick={() => setChPw(true)}>Change password</button>
+                    <button type="button" className="actionButton" onClick={() => setChPw(true)}>Jelszó megváltoztatása</button>
                 )}
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                <input type="submit" value="Save" style={{ width: "100%", margin: "3px" }} />
+                <input type="submit" value="Mentés" style={{ width: "100%", margin: "3px" }} />
                 <input type="button" className="dangerButton" style={{ width: "100%", margin: "3px" }} onClick={() => {
                     setModalOpened(false)
                     setModal({ title: "", elements: <></> })
-                }} value="Cancel" />
+                }} value="Mégse" />
             </div>
         </form>
     )
@@ -185,7 +185,7 @@ function AdminUserCard({ user, setModalOpened, setModal, reload, variations }: U
         if (result.ok) {
             reload()
             setModalOpened(false)
-            toast.success("Successfully deleted user!")
+            toast.success("Felhasználó sikeresen törlésre került!")
             setModal({ title: "", elements: <></> })
         } else {
             toast.error((await result.json()).message)
@@ -194,14 +194,14 @@ function AdminUserCard({ user, setModalOpened, setModal, reload, variations }: U
 
     function deleteUserModal() {
         setModal({
-            title: "Confirm deletion of user " + user.username,
+            title: user.username + " törlésének megerősítése",
             elements:
                 <div>
-                    <button className="actionButton dangerButton" onClick={deleteUserAction}>Delete</button>
+                    <button className="actionButton dangerButton" onClick={deleteUserAction}>Törlés</button>
                     <button className="actionButton" onClick={() => {
                         setModalOpened(false)
                         setModal({ title: "", elements: <></> })
-                    }}>Cancel</button>
+                    }}>Mégse</button>
                 </div>
         })
         setModalOpened(true)
@@ -218,7 +218,7 @@ function AdminUserCard({ user, setModalOpened, setModal, reload, variations }: U
         if (result.ok) {
             reload()
             setModalOpened(false)
-            toast.success("User " + user.username + " accepted!")
+            toast.success(user.username + " elfogadva!")
             setModal({ title: "", elements: <></> })
         } else {
             toast.error((await result.json()).message)
@@ -228,7 +228,7 @@ function AdminUserCard({ user, setModalOpened, setModal, reload, variations }: U
 
     async function editUserModal() {
         setModal({
-            title: `Edit user "${user.username}"`,
+            title: `"${user.username}" szerkesztése`,
             elements:
                 <EditUserForm user={user} setModal={setModal} setModalOpened={setModalOpened} reload={reload} adminPanel />
         })
@@ -241,15 +241,15 @@ function AdminUserCard({ user, setModalOpened, setModal, reload, variations }: U
         }
             headerChildren={
                 <>
-                    {!user.accepted && <button className="actionButton dangerButton" style={{ borderColor: "var(--success)" }} onClick={acceptUser}>Accept<FontAwesomeIcon icon={faCheckDouble} /></button>}
-                    <button className="actionButton" onClick={editUserModal}>Edit <FontAwesomeIcon icon={faPenToSquare} /></button>
-                    <button className="actionButton dangerButton" onClick={deleteUserModal}>Delete <FontAwesomeIcon icon={faTrash} /></button>
+                    {!user.accepted && <button className="actionButton dangerButton" style={{ borderColor: "var(--success)" }} onClick={acceptUser}>Elfogadás<FontAwesomeIcon icon={faCheckDouble} /></button>}
+                    <button className="actionButton" onClick={editUserModal}>Szerkesztés <FontAwesomeIcon icon={faPenToSquare} /></button>
+                    <button className="actionButton dangerButton" onClick={deleteUserModal}>Törlés <FontAwesomeIcon icon={faTrash} /></button>
                 </>
             }>
             <hr />
-            {user.transactions.map((transaction) => (
+            {user.transactions.length > 0 ? user.transactions.map((transaction) => (
                 <AdminTransactionCard transaction={transaction} setModalOpened={setModalOpened} setModal={setModal} reload={reload} variations={variations || []} pool={false} />
-            ))}
+            )) : <p style={{ textAlign: "center", fontWeight: 200, color: "var(--text-muted)", margin: "15px" }}>Még nincsenek tranzakciók!</p>}
         </SectionCard>
     )
 }

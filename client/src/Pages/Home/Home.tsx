@@ -130,16 +130,16 @@ export function HomePage() {
             let title = ""
             switch (buttonName) {
                 case "addCoffee":
-                    title = "Add coffee to pool"
+                    title = "Kávé hozzáadása"
                     break
                 case "addMoney":
-                    title = "Add money to pool"
+                    title = "Pénz hozzáadása"
                     break
                 case "drink":
-                    title = "Drink from pool"
+                    title = "Ivás"
                     break
                 case "useMoney":
-                    title = "Use money from pool"
+                    title = "Pénz felhasználása"
                     break
                 default:
                     return null
@@ -191,26 +191,26 @@ export function HomePage() {
                 <SectionCard className="actionContainer">
                     <button className="drinkAction" name="drink" onClick={handleActionButton}>
                         <FontAwesomeIcon icon={faCoffee} />
-                        Drink
+                        Ivás
                     </button>
                     <button className="addCoffeeAction" name="addCoffee" onClick={handleActionButton}>
                         <FontAwesomeIcon icon={faCoffee} />
-                        Add coffee
+                        Kávé hozzáadása
                     </button>
                     <button className="addMoneyAction" name="addMoney" onClick={handleActionButton}>
                         <FontAwesomeIcon icon={faMoneyBillWave} />
-                        Add money
+                        Pénz hozzáadása
                     </button>
                     <button className="useMoneyAction" name="useMoney" onClick={handleActionButton}>
                         <FontAwesomeIcon icon={faMoneyBillWave} />
-                        Use money
+                        Pénz felhasználása
                     </button>
                 </SectionCard>
                 <div className="cardContainer">
-                    <SectionCard collapseable title="History" wrap={currWidth > 800} currWidth={currWidth}>
+                    <SectionCard collapseable title="Előzmények" wrap={currWidth > 800} currWidth={currWidth}>
                         {transactions.map((transaction) => (<HistoryCard transaction={transaction} balances={balances} getPoolTransactions={getPoolTransactions} loadUserData={loadUserData} setModal={setModal} setModalOpened={setModalOpened} variations={variations} key={transaction.id} />))}
                     </SectionCard>
-                    <SectionCard collapseable title="Balances" wrap={currWidth > 800} currWidth={currWidth}>
+                    <SectionCard collapseable title="Egyenlegek" wrap={currWidth > 800} currWidth={currWidth}>
                         {balances.map((balance) => (<BalanceCard balance={balance} highlighted={balance.poolId == pool} />))}
                     </SectionCard>
                 </div>

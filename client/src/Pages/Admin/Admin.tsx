@@ -34,7 +34,7 @@ export function AdminPage() {
             const resultJson = await result.json()
             setPools(resultJson.result)
         } else {
-            toast.error("Falied to load pools!")
+            toast.error("Hiba a medencék betöltésekor!")
         }
     }
 
@@ -61,15 +61,15 @@ export function AdminPage() {
 
     function addPoolModal() {
         setModal({
-            title: "Add pool",
+            title: "Medence hozzáadása",
             elements:
                 <form action="" onSubmit={createPool} >
-                    <input type="text" name="name" placeholder="Pool name..." required={true} />
-                    <input type="submit" value="Create" />
+                    <input type="text" name="name" placeholder="Név..." required={true} />
+                    <input type="submit" value="Hozzáadás" />
                     <input type="button" className="dangerButton" onClick={() => {
                         setModalOpened(false)
                         setModal({ title: "", elements: <></> })
-                    }} value="Cancel" />
+                    }} value="Mégse" />
                 </form>
         })
         setModalOpened(true)
@@ -90,7 +90,7 @@ export function AdminPage() {
             const resultJson = await result.json()
             setVariations(resultJson.result)
         } else {
-            toast.error("Falied to load variations!")
+            toast.error("Hiba a variációk betöltésekor!")
         }
     }
 
@@ -118,16 +118,16 @@ export function AdminPage() {
 
     async function addVariationModal() {
         setModal({
-            title: "Add new variation",
+            title: "Variáció hozzáadása",
             elements:
                 <form action="" onSubmit={createVariation}>
-                    <input type="text" name="id" placeholder="Variation name..." required={true} />
+                    <input type="text" name="id" placeholder="Név..." required={true} />
                     <input type="number" name="coffeeAmount" style={{ width: "100px" }} required={true} />g
-                    <input type="submit" value="Add" />
+                    <input type="submit" value="Hozzáadás" />
                     <input type="button" className="dangerButton" onClick={() => {
                         setModalOpened(false)
                         setModal({ title: "", elements: <></> })
-                    }} value="Cancel" />
+                    }} value="Mégse" />
                 </form>
         })
         setModalOpened(true)
@@ -157,16 +157,16 @@ export function AdminPage() {
 
     async function editVariationModal(id: string, coffeeAmount: number) {
         setModal({
-            title: "Edit variation",
+            title: "Variáció szerkesztése",
             elements:
                 <form action="" onSubmit={(e) => { editVariation(e, id) }}>
-                    <input type="text" name="id" placeholder="Variation name..." required={true} defaultValue={id} />
+                    <input type="text" name="id" placeholder="Új név..." required={true} defaultValue={id} />
                     <input type="number" name="coffeeAmount" style={{ width: "100px" }} required={true} defaultValue={coffeeAmount} />g
-                    <input type="submit" value="Save" />
+                    <input type="submit" value="Mentés" />
                     <input type="button" className="dangerButton" onClick={() => {
                         setModalOpened(false)
                         setModal({ title: "", elements: <></> })
-                    }} value="Cancel" />
+                    }} value="Mégse" />
                 </form>
         })
         setModalOpened(true)
@@ -177,7 +177,7 @@ export function AdminPage() {
         if (result.ok) {
             loadVariations()
             setModalOpened(false)
-            toast.success("Successfully deleted variation!")
+            toast.success("Variáció sikeresen törtlésre került!")
             setModal({ title: "", elements: <></> })
         } else {
             toast.error((await result.json()).message)
@@ -186,14 +186,14 @@ export function AdminPage() {
 
     async function deleteVariationModal(id: string) {
         setModal({
-            title: "Delete variation",
+            title: "Variáció törlése",
             elements:
                 <div>
-                    <button className="actionButton dangerButton" onClick={() => { deleteVariation(id) }}>Delete</button>
+                    <button className="actionButton dangerButton" onClick={() => { deleteVariation(id) }}>Törlés</button>
                     <button className="actionButton" onClick={() => {
                         setModalOpened(false)
                         setModal({ title: "", elements: <></> })
-                    }}>Cancel</button>
+                    }}>Mégse</button>
                 </div>
         })
         setModalOpened(true)
@@ -209,7 +209,7 @@ export function AdminPage() {
             const resultJson = await result.json()
             setUsers(resultJson.result)
         } else {
-            toast.error("Falied to load users!")
+            toast.error("Hiba a felhasználók betöltésekor!")
         }
     }
 
@@ -239,24 +239,24 @@ export function AdminPage() {
 
     async function addUserModal() {
         setModal({
-            title: "Add new user",
+            title: "Új felhasználó regisztrációja",
             elements:
                 <form action="" className="newUserForm" onSubmit={addUserAction}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                        Username: <input type="username" name="username" placeholder="Username" />
+                        Felhasználónév: <input type="username" name="username" placeholder="Felhasználónév" />
                     </div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                        Password: <input type="password" name="password" placeholder="Password" />
+                        Jelszó: <input type="password" name="password" placeholder="Jelszó" />
                     </div>
                     <div style={{ display: "flex", alignItems: "center", margin: "5px" }}>
-                        Admin: <input type="checkbox" name="admin" defaultChecked={false} />
+                        Adminisztrátor: <input type="checkbox" name="admin" defaultChecked={false} />
                     </div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                        <input type="submit" value="Register" style={{ width: "100%", margin: "3px" }} />
+                        <input type="submit" value="Regisztálás" style={{ width: "100%", margin: "3px" }} />
                         <input type="button" className="dangerButton" style={{ width: "100%", margin: "3px" }} onClick={() => {
                             setModalOpened(false)
                             setModal({ title: "", elements: <></> })
-                        }} value="Cancel" />
+                        }} value="Mégse" />
                     </div>
                 </form>
         })
@@ -281,28 +281,28 @@ export function AdminPage() {
             </ModalWrapper>
             <TopBar user={user} setModal={setModal} setModalOpened={setModalOpened} reload={loadUser} />
             <main className="adminPage">
-                <SectionCard title="Pools" collapseable headerChildren={
-                    <button onClick={addPoolModal}>Add Pool <FontAwesomeIcon icon={faPlus} /></button>
+                <SectionCard title="Medencék" collapseable headerChildren={
+                    <button onClick={addPoolModal}>Medence hozzáadása <FontAwesomeIcon icon={faPlus} /></button>
                 }>
                     <hr />
                     <AdminPools pools={pools || []} setModal={setModal} setModalOpened={setModalOpened} reload={loadPools} variations={variations} />
                 </SectionCard>
-                <SectionCard title="Variations" collapseable headerChildren={
-                    <button onClick={addVariationModal}>Add variation<FontAwesomeIcon icon={faPlus} /></button>
+                <SectionCard title="Variációk" collapseable headerChildren={
+                    <button onClick={addVariationModal}>Variáció hozzáadása<FontAwesomeIcon icon={faPlus} /></button>
                 }>
                     <hr />
                     {variations?.map((variation) => (
                         <div className="variationCard">
-                            <p>{variation.id} | {variation.coffeeAmount}g/serving</p>
+                            <p>{variation.id} | {variation.coffeeAmount}g/adag</p>
                             <div>
-                                <button className="actionButton" onClick={() => { editVariationModal(variation.id, variation.coffeeAmount) }}>Edit<FontAwesomeIcon icon={faPenToSquare} /></button>
-                                <button className="actionButton dangerButton" onClick={() => { deleteVariationModal(variation.id) }}>Delete<FontAwesomeIcon icon={faTrash} /></button>
+                                <button className="actionButton" onClick={() => { editVariationModal(variation.id, variation.coffeeAmount) }}>Szerkesztés<FontAwesomeIcon icon={faPenToSquare} /></button>
+                                <button className="actionButton dangerButton" onClick={() => { deleteVariationModal(variation.id) }}>Törlés<FontAwesomeIcon icon={faTrash} /></button>
                             </div>
                         </div>
                     ))}
                 </SectionCard>
-                <SectionCard title="Users" collapseable headerChildren={
-                    <button onClick={addUserModal}>Register User<FontAwesomeIcon icon={faPlus} /></button>
+                <SectionCard title="Felhasználók" collapseable headerChildren={
+                    <button onClick={addUserModal}>Felhasználó regisztrációja<FontAwesomeIcon icon={faPlus} /></button>
                 }>
                     <hr />
                     <AdminUsers users={users} setModal={setModal} setModalOpened={setModalOpened} reload={loadUsers} variations={variations} />
