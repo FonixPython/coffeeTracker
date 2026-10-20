@@ -100,7 +100,6 @@ export function EditTransactionModal({ transaction, setModal, setModalOpened, ba
             toast.error(resultJson.message)
         }
     }
-
     const [customVariation, setCustomVariation] = useState(transaction.coffeeVariationId == null)
     const [avgCost, setAvgCost] = useState(0)
     const [coffeeAmount, setCoffeeAmount] = useState(transaction.coffeeAmount)
@@ -259,16 +258,19 @@ export function EditTransactionModal({ transaction, setModal, setModalOpened, ba
                     </div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
                         <p>Variáció: </p>
-                        <select className="machineName" required name="variation" defaultValue={transaction.coffeeVariationId != null ? transaction.coffeeVariationId : "customVariationValue"} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                            if (e.target.value !== "customVariationValue") {
-                                setCustomVariation(false)
-                                setCoffeeAmount(variations?.find(variation => variation.id === e.target.value)?.coffeeAmount ?? 0)
+                        <select className="machineName" required name="variation" defaultValue={transaction.coffeeVariationId == null ? "customVariationValue" : transaction.coffeeVariationId} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                            const value = e.target.value;
+                            if (value === "customVariationValue") {
+                                setCustomVariation(true);
+                                setCoffeeAmount(transaction.coffeeAmount);
                             } else {
-                                setCoffeeAmount(0)
+                                setCustomVariation(false);
+                                setCoffeeAmount(variations?.find(variation => variation.id === e.target.value)?.coffeeAmount ?? 0)
                             }
-                        }}>
+                        }}
+                        >
                             {variations.map((variation) => (<option key={variation.id} value={variation.id}>{variation.id}</option>))}
-                            <option onClick={() => { setCustomVariation(true) }} value="customVariationValue">Egyéni</option>
+                            <option value="customVariationValue">Egyéni</option>
                         </select>
                     </div>
                     {customVariation &&

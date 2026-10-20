@@ -8,7 +8,9 @@
     "build:backend": "cd backend && tsc",
     "build": "npm run build:frontend && npm run build:backend",
     "start": "node dist/index",
-    "dev": "cd client && vite dev",
+    "dev:frontend": "cd client && vite --host",
+    "dev:backend": "tsx watch backend/src/index.ts",
+    "dev": "concurrently -k \"npm:dev:frontend\" \"npm:dev:backend\"",
     "f": "npm run build && npm run start"
   },
   "repository": {
@@ -34,6 +36,7 @@
     "@types/bcrypt": "^6.0.0",
     "bcrypt": "^6.0.0",
     "better-sqlite3": "^13.0.3",
+    "concurrently": "^10.0.6",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
@@ -44,6 +47,7 @@
     "react-router-dom": "^7.18.2",
     "sharp": "^0.35.4",
     "sonner": "^2.0.8",
+    "tsx": "^4.23.15",
     "typescript": "^7.0.2"
   },
   "devDependencies": {
