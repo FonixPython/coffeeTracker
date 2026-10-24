@@ -184,7 +184,7 @@ export function HomePage() {
                         }} className="machineName">
                             {balances.map((balance) => (<option key={balance.poolId} value={balance.poolId}>{balance.poolName}</option>))}
                         </select>
-                        <p className="userBalance">{formatMoney(selectedBalance?.moneyBalance || 0)}</p>
+                        <p className="userBalance" style={Number(selectedBalance?.moneyBalance) < 0 ? { color: "var(--danger)" } : {}}>{formatMoney(selectedBalance?.moneyBalance || 0)}</p>
                         <p className="coffeeBalance">{formatWeight(selectedBalance?.coffeeAmount || 0)}</p>
                     </div>
                 </SectionCard>
