@@ -12,7 +12,7 @@ export function BalanceCard({ balance, highlighted }: BalanceCardProps) {
         <div className="balanceCard" style={highlighted ? { borderColor: "var(--secondary)", borderWidth: "3px", scale: "1.01" } : {}}>
             <p className="machineName">{balance.poolName}</p>
             <hr />
-            <p className="userBalance">{formatMoney(balance.moneyBalance || 0)}</p>
+            <p className="userBalance" style={Number(balance.moneyBalance) < 0 ? { color: "var(--danger)" } : {}}>{formatMoney(balance.moneyBalance || 0)}</p>
             <p className="coffeeBalance">{formatWeight(balance.coffeeAmount || 0)}-nyi kávé</p>
         </div>
     )

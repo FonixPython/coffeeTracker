@@ -297,8 +297,8 @@ export function AddTransactionModal({ type, setModal, setModalOpened, setPool, s
                         <p style={!canDrink ? { color: "var(--danger)" } : {}}><strong>Becsült érték:</strong> ~{Math.ceil(avgCost * coffeeAmount)} Ft</p>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                        <input type="submit" className={!canDrink ? "dangerButton" : ""} value="Hozzáadás" style={{ width: "100%", margin: "3px" }} disabled={!canDrink} />
-                        <input type="button" className={canDrink ? "dangerButton" : ""} style={{ width: "100%", margin: "3px" }} onClick={() => {
+                        <input type="submit" className={!hasEnoughCoffee ? "dangerButton" : ""} value="Hozzáadás" style={{ width: "100%", margin: "3px" }} disabled={!hasEnoughCoffee} />
+                        <input type="button" className={hasEnoughCoffee ? "dangerButton" : ""} style={{ width: "100%", margin: "3px" }} onClick={() => {
                             setModalOpened(false)
                             setModal({ title: "", elements: <></> })
                         }} value="Mégse" />

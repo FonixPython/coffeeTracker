@@ -283,8 +283,8 @@ export function EditTransactionModal({ transaction, setModal, setModalOpened, ba
                         <p style={!canDrink ? { color: "var(--danger)" } : {}}><strong>Becsült érték:</strong> ~{Math.abs(Math.ceil(avgCost * coffeeAmount))} Ft</p>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
-                        <input type="submit" className={!canDrink ? "dangerButton" : ""} value="Mentés" style={{ width: "100%", margin: "3px" }} disabled={!canDrink} />
-                        <input type="button" className={canDrink ? "dangerButton" : ""} style={{ width: "100%", margin: "3px" }} onClick={() => {
+                        <input type="submit" className={!hasEnoughCoffee ? "dangerButton" : ""} value="Mentés" style={{ width: "100%", margin: "3px" }} disabled={!hasEnoughCoffee} />
+                        <input type="button" className={hasEnoughCoffee ? "dangerButton" : ""} style={{ width: "100%", margin: "3px" }} onClick={() => {
                             setModalOpened(false)
                             setModal({ title: "", elements: <></> })
                         }} value="Mégse" />

@@ -107,9 +107,11 @@ export async function addTransaction(req: Request & Record<string, any>, res: Re
                 if (!hasEnoughCoffee) {
                     return res.status(400).json({ message: "Not enough coffee!" })
                 }
+                /* People can go now into the negatives, idk why, but sure
                 if (!hasEnoughMoney) {
                     return res.status(400).json({ message: "Not enough money!" })
                 }
+                */
                 break
             case "addCoffee":
                 data.coffeeAmount = data.coffeeAmount > 0 ? data.coffeeAmount : data.coffeeAmount * -1
@@ -199,9 +201,11 @@ export async function editTransaction(req: Request & Record<string, any>, res: R
                 if (!hasEnoughCoffee) {
                     return res.status(400).json({ message: "Not enough coffee!" })
                 }
+                /* Again, client requested the ability for people to go into the negatives
                 if (!hasEnoughMoney) {
                     return res.status(400).json({ message: "Not enough money!" })
                 }
+                */
                 break
             case "addCoffee":
                 data.coffeeAmount = data.coffeeAmount > 0 ? data.coffeeAmount : data.coffeeAmount * -1
