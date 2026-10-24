@@ -22,7 +22,7 @@ model Token {
   userId      String
   userAgent   String
   dateOfLogin DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Pool {
@@ -40,7 +40,7 @@ model Setting {
 model Transaction {
   id                   String           @id @default(uuid())
   companyTransactionId String?
-  userId               String
+  userId               String?
   poolId               String
   type                 String
   moneyAmount          Int
@@ -49,7 +49,7 @@ model Transaction {
   dateOfTransaction    DateTime         @default(now())
   coffeevariation      CoffeeVariation? @relation(fields: [coffeeVariationId], references: [id])
   pool                 Pool             @relation(fields: [poolId], references: [id])
-  user                 User             @relation(fields: [userId], references: [id])
+  user                 User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
 model CoffeeVariation {

@@ -275,7 +275,7 @@ export function AdminTransactionCard({ transaction, setModal, setModalOpened, re
                     <FontAwesomeIcon icon={transaction.type == "addMoney" ? faMoneyBillWave : faCoffee} />
                 </div>
                 <div className="textContainer">
-                    <p className="actionText">{pool ? `${transaction.user?.username} ` : ""}{text}{!pool ? ` in ${transaction.pool?.name}` : ""}</p>
+                    <p className="actionText">{pool ? `${transaction.user?.username == undefined ? "Törölt felhasználó" : transaction.user?.username} ` : ""}{text}{!pool ? ` in ${transaction.pool?.name}` : ""}</p>
                     <p className="amountText">{transaction.moneyAmount} Ft {transaction.type != "addMoney" ? `(${transaction.coffeeAmount}g)` : ""}</p>
                 </div>
             </div>
