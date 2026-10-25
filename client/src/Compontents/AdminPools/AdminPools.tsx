@@ -1,13 +1,14 @@
 import { SectionCard } from "../SectionCard/SectionCard"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPenToSquare, faTrash, faMoneyBillWave, faCoffee, faQrcode } from "@fortawesome/free-solid-svg-icons"
+import { faPenToSquare, faTrash, faMoneyBillWave, faCoffee, faQrcode, faGlobe } from "@fortawesome/free-solid-svg-icons"
 import { toast } from "sonner"
 import "./AdminPools.css"
 import type { User } from "../AdminUsers/AdminUsers"
 import { EditTransactionModal } from "../EditTransactionModal/EditTransactionModal"
-import type { Balance, Variation } from "../../Pages/Home/Home"
-import { useEffect, useRef, useState } from "react"
+import type { Variation } from "../../Pages/Home/Home"
+import { useEffect, useRef } from "react"
 import QRCode from "qrcode"
+import { AddTransactionModal } from "../AddTransactionModal/AddTransactionModal"
 
 export interface Transaction {
     id: string,
@@ -59,7 +60,7 @@ export function AdminPools({ pools, setModalOpened, setModal, reload, variations
     return (
         <>
             {pools.map((pool) => (
-                <AdminPoolCard pool={pool} setModal={setModal} setModalOpened={setModalOpened} reload={reload} variations={variations} />
+                <AdminPoolCard pool={pool} key={pool.id} setModal={setModal} setModalOpened={setModalOpened} reload={reload} variations={variations} />
             ))}
         </>
     )
@@ -174,32 +175,31 @@ function AdminPoolCard({ pool, setModal, setModalOpened, reload, variations }: A
         setModalOpened(true)
     }
 
+    async function globalTransactionModal() {
+        setModal({
+            title: "Globális tranzakció hozzáadása",
+            elements: <AddTransactionModal type="globalTransaction" setModal={setModal} setModalOpened={setModalOpened} pool={pool.id} setPool={() => { }} variations={[]} balances={[]} setSearchParams={() => { }} loadUserData={reload} getPoolTransactions={() => { }} />
+        })
+        setModalOpened(true)
+    }
+
     return (
         <SectionCard key={pool.id} title={pool.name} collapseable={true} headerChildren={<>
+            <button className="actionButton" onClick={globalTransactionModal}>Globális Tranzakció<FontAwesomeIcon icon={faGlobe} /></button>
             <button className="actionButton" onClick={showQr}>QR megjelenítése<FontAwesomeIcon icon={faQrcode} /></button>
             <button className="actionButton" onClick={editPoolModal}>Szerkesztés <FontAwesomeIcon icon={faPenToSquare} /></button>
             <button className="actionButton dangerButton" onClick={deletePoolModal}>Törlés <FontAwesomeIcon icon={faTrash} /></button>
         </>}>
             <hr />
             {pool.transactions.length > 0 ? pool.transactions.map((transaction) => (
-                <AdminTransactionCard transaction={transaction} setModal={setModal} setModalOpened={setModalOpened} reload={reload} pool variations={variations} />
+                <AdminTransactionCard key={transaction.id} transaction={transaction} setModal={setModal} setModalOpened={setModalOpened} reload={reload} pool variations={variations} />
             )) : <p style={{ textAlign: "center", fontWeight: 200, color: "var(--text-muted)", margin: "15px" }}>Még nincsenek tranzakciók!</p>}
         </SectionCard>
     )
 }
 
 export function AdminTransactionCard({ transaction, setModal, setModalOpened, reload, pool, variations }: AdminTransactionCardProps) {
-    const [balances, setBalances] = useState<Balance[]>([])
-    async function loadBalances() {
-        const balancesResponse = await fetch("/api/getBalancesForUser/" + transaction.user)
-        const balancesResponseJson = await balancesResponse.json()
-        if (balancesResponse.ok) {
-            setBalances(balancesResponseJson.result)
-        } else {
-            toast.error(balancesResponseJson.message)
-        }
-    }
-    loadBalances()
+
     let color = ""
     let text = ""
     switch (transaction.type) {
@@ -219,6 +219,10 @@ export function AdminTransactionCard({ transaction, setModal, setModalOpened, re
             color = "var(--danger)"
             text = "pénzt használt fel"
             break
+        case ("globalTransaction"):
+            color = "var(--bg-dark)"
+            text = "globális tranzakciót hajtott végre"
+            break
         default:
             color = "var(--bg-dark)"
             text = "ismeretlen akciót hajtott végre"
@@ -226,19 +230,25 @@ export function AdminTransactionCard({ transaction, setModal, setModalOpened, re
     }
 
     async function editTransaction() {
-        setModal({
-            title: "Tranzakció szerkesztése",
-            elements: <EditTransactionModal
-                transaction={transaction}
-                balances={balances}
-                variations={variations}
-                setModal={setModal}
-                setModalOpened={setModalOpened}
-                loadUserData={reload}
-                getPoolTransactions={() => { }}
-            />
-        })
-        setModalOpened(true)
+        const balancesResponse = await fetch("/api/getBalancesForUser/" + transaction.user?.id)
+        const balancesResponseJson = await balancesResponse.json()
+        if (balancesResponse.ok) {
+            setModal({
+                title: "Tranzakció szerkesztése",
+                elements: <EditTransactionModal
+                    transaction={transaction}
+                    balances={balancesResponseJson.result}
+                    variations={variations}
+                    setModal={setModal}
+                    setModalOpened={setModalOpened}
+                    loadUserData={reload}
+                    getPoolTransactions={() => { }}
+                />
+            })
+            setModalOpened(true)
+        } else {
+            toast.error(balancesResponseJson.message)
+        }
     }
 
     async function deleteTransactionAction() {

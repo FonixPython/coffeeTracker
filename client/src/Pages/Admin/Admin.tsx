@@ -271,7 +271,7 @@ export function AdminPage() {
 
     useEffect(() => {
         loadUser()
-    }, users)
+    }, [users])
 
     return (
         <>
@@ -292,11 +292,11 @@ export function AdminPage() {
                 }>
                     <hr />
                     {variations?.map((variation) => (
-                        <div className="variationCard">
-                            <p>{variation.id} | {variation.coffeeAmount}g/adag</p>
-                            <div>
-                                <button className="actionButton" onClick={() => { editVariationModal(variation.id, variation.coffeeAmount) }}>Szerkesztés<FontAwesomeIcon icon={faPenToSquare} /></button>
-                                <button className="actionButton dangerButton" onClick={() => { deleteVariationModal(variation.id) }}>Törlés<FontAwesomeIcon icon={faTrash} /></button>
+                        <div className="variationCard" key={variation.id}>
+                            <p key={variation.id + "text"}>{variation.id} | {variation.coffeeAmount}g/adag</p>
+                            <div key={variation.id + "div"}>
+                                <button key={variation.id + "button1"} className="actionButton" onClick={() => { editVariationModal(variation.id, variation.coffeeAmount) }}>Szerkesztés<FontAwesomeIcon icon={faPenToSquare} /></button>
+                                <button key={variation.id + "button2"} className="actionButton dangerButton" onClick={() => { deleteVariationModal(variation.id) }}>Törlés<FontAwesomeIcon icon={faTrash} /></button>
                             </div>
                         </div>
                     ))}

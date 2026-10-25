@@ -208,10 +208,10 @@ export function HomePage() {
                 </SectionCard>
                 <div className="cardContainer">
                     <SectionCard collapseable title="Előzmények" wrap={currWidth > 800} currWidth={currWidth}>
-                        {transactions.map((transaction) => (<HistoryCard transaction={transaction} balances={balances} getPoolTransactions={getPoolTransactions} loadUserData={loadUserData} setModal={setModal} setModalOpened={setModalOpened} variations={variations} key={transaction.id} />))}
+                        {transactions.map((transaction) => (<HistoryCard key={transaction.id} transaction={transaction} balances={balances} getPoolTransactions={getPoolTransactions} loadUserData={loadUserData} setModal={setModal} setModalOpened={setModalOpened} variations={variations} />))}
                     </SectionCard>
                     <SectionCard collapseable title="Egyenlegek" wrap={currWidth > 800} currWidth={currWidth}>
-                        {balances.map((balance) => (<BalanceCard balance={balance} highlighted={balance.poolId == pool} />))}
+                        {balances.map((balance) => (<BalanceCard key={balance.poolId} balance={balance} highlighted={balance.poolId == pool} />))}
                     </SectionCard>
                 </div>
             </main>
