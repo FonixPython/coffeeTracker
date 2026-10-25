@@ -5,7 +5,7 @@ import { calculateCoffeeCost } from "./userActionController.js";
 
 export async function getAllUsers(req: Request, res: Response) {
     try {
-        const result = await prisma.user.findMany({ include: { transactions: { where: { type: { notIn: ["useUpMoney"] } }, orderBy: { dateOfTransaction: "desc" }, include: { pool: { select: { name: true } } } } }, omit: { passwordHash: true } })
+        const result = await prisma.user.findMany({ include: { transactions: { where: { NOT: [{ type: { in: ["useUpMoney", "globalTransaction"] } }] }, orderBy: { dateOfTransaction: "desc" }, include: { pool: { select: { name: true } } } } }, omit: { passwordHash: true } })
         return res.json({ message: "Successfully retrieved users!", result: result })
     } catch (e) {
         console.log()
@@ -23,12 +23,13 @@ export async function getBalancesForSpecificUser(req: Request & Record<string, a
             const moneyAmount = await prisma.transaction.aggregate({ where: { poolId: pools[i].id, userId: userId }, _sum: { moneyAmount: true } })
             const coffeeAmount = await prisma.transaction.aggregate({ where: { poolId: pools[i].id }, _sum: { coffeeAmount: true } })
             const poolMoneyOnly = await prisma.transaction.aggregate({ where: { poolId: pools[i].id, type: { in: ["useUpMoney", "addMoney"] } }, _sum: { moneyAmount: true } })
+            const globallyAdded = await prisma.transaction.aggregate({ where: { poolId: pools[i].id, type: "addMoney", companyTransactionId: { not: null } }, _sum: { moneyAmount: true } })
             resultObject.push({
                 poolId: pools[i].id,
                 poolName: pools[i].name,
                 moneyBalance: Number(moneyAmount._sum.moneyAmount),
                 coffeeAmount: Number(coffeeAmount._sum.coffeeAmount),
-                poolMoneyOnly: Number(poolMoneyOnly._sum.moneyAmount)
+                poolMoneyOnly: Number(poolMoneyOnly._sum.moneyAmount) - Number(globallyAdded._sum.moneyAmount)
             })
         }
         return res.json({ message: "Successfully retrieved balances!", result: resultObject })
@@ -62,7 +63,7 @@ export async function deleteSpecifiedUser(req: Request & Record<string, any>, re
 
 export async function getPools(req: Request, res: Response) {
     try {
-        const result = await prisma.pool.findMany({ include: { transactions: { where: { type: { notIn: ["useUpMoney"] } }, orderBy: { dateOfTransaction: "desc" }, include: { user: { select: { username: true } } } } } })
+        const result = await prisma.pool.findMany({ include: { transactions: { where: { NOT: [{ type: { in: ["useUpMoney"] } }, { AND: [{ type: "addMoney" }, { companyTransactionId: { not: null } }] }] }, orderBy: { dateOfTransaction: "desc" }, include: { user: { select: { username: true, id: true } } } } } })
         return res.json({ message: "Successfully retrieved pools!", result: result })
     } catch (e) {
         console.log(e)

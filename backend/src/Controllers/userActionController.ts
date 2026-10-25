@@ -9,13 +9,13 @@ export async function getBalances(req: Request & Record<string, any>, res: Respo
             const moneyAmount = await prisma.transaction.aggregate({ where: { poolId: pools[i].id, userId: req.user.id, type: { not: "globalTransaction" } }, _sum: { moneyAmount: true } })
             const coffeeAmount = await prisma.transaction.aggregate({ where: { poolId: pools[i].id }, _sum: { coffeeAmount: true } })
             const poolMoneyOnly = await prisma.transaction.aggregate({ where: { poolId: pools[i].id, type: { in: ["useUpMoney", "addMoney"] } }, _sum: { moneyAmount: true } })
-            const globallyAdded = await prisma.transaction.aggregate({ where: { poolId: pools[i].id, type: "addMoney", companyTransactionId: { not: null } } })
+            const globallyAdded = await prisma.transaction.aggregate({ where: { poolId: pools[i].id, type: "addMoney", companyTransactionId: { not: null } }, _sum: { moneyAmount: true } })
             resultObject.push({
                 poolId: pools[i].id,
                 poolName: pools[i].name,
                 moneyBalance: Number(moneyAmount._sum.moneyAmount),
                 coffeeAmount: Number(coffeeAmount._sum.coffeeAmount),
-                poolMoneyOnly: Number(poolMoneyOnly._sum.moneyAmount) - Number(globallyAdded)
+                poolMoneyOnly: Number(poolMoneyOnly._sum.moneyAmount) - Number(globallyAdded._sum.moneyAmount)
             })
         }
         return res.json({ message: "Successfully retrieved balances!", result: resultObject })
@@ -141,7 +141,7 @@ export async function addTransaction(req: Request & Record<string, any>, res: Re
                 data.coffeeAmount = Math.abs(data.coffeeAmount)
                 break
             case "globalTransaction":
-                if (req.body.user.permission != "admin") {
+                if (req.user.permission != "admin") {
                     return res.status(403).json({ message: "Unauthorized for this transaction!" })
                 }
                 const globalResult = await prisma.transaction.create({
@@ -160,7 +160,7 @@ export async function addTransaction(req: Request & Record<string, any>, res: Re
                 let manyData = []
                 for (let i = 0; i < users.length; i++) {
                     manyData.push({
-                        companyTransaction: globalResult.id,
+                        companyTransactionId: globalResult.id,
                         userId: users[i].id,
                         poolId: req.body.poolId,
                         type: "addMoney",
@@ -268,17 +268,11 @@ export async function editTransaction(req: Request & Record<string, any>, res: R
                 data.coffeeAmount = Math.abs(data.coffeeAmount)
                 break
             case "globalTransaction":
-                if (req.body.user.permission != "admin") {
+                if (req.user.permission != "admin") {
                     return res.status(403).json({ message: "Unauthorized for this transaction!" })
                 }
-                let manyData = []
-                const companyTransactions = await prisma.transaction.findMany({ where: { companyTransactionId: transactionId } })
-                for (let i = 0; i < companyTransactions.length; i++) {
-                    manyData.push({
-                        moneyAmount: Math.floor(data.moneyAmount / companyTransactions.length)
-                    })
-                }
-                const updateManyResult = await prisma.transaction.updateManyAndReturn({ where: { companyTransactionId: transactionId }, data: manyData })
+                const companyTransactionsCount = await prisma.transaction.count({ where: { companyTransactionId: transactionId, type: "addMoney" } })
+                const updateManyResult = await prisma.transaction.updateManyAndReturn({ where: { companyTransactionId: transactionId }, data: { moneyAmount: Math.floor(data.moneyAmount / companyTransactionsCount) } })
                 if (!updateManyResult) {
                     return res.status(500).json({ message: "Internal server error!" })
                 }

@@ -1,6 +1,6 @@
 import { toast } from "sonner"
 import type { Balance, Variation } from "../../Pages/Home/Home"
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 
 interface AddTransactionModalProps {
     type: string,
@@ -39,6 +39,34 @@ export function AddTransactionModal({ type, setModal, setModalOpened, setPool, s
             setModal({ title: "", elements: <></> })
             toast.success("Tranzakció sikeresen hozzáadásra került!")
             getPoolTransactions()
+        } else {
+            const resultJson = await result.json()
+            toast.error(resultJson.message)
+        }
+    }
+
+    async function globalTransactionAction(e: React.SubmitEvent) {
+        e.preventDefault()
+        const data = new FormData(e.target)
+        const coffeeAmount = Number(data.get("coffeeAmount"))
+        const moneyAmount = Number(data.get("moneyAmount"))
+        const result = await fetch("/api/addTransaction", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                type: "globalTransaction",
+                coffeeAmount,
+                moneyAmount,
+                poolId: pool,
+            })
+        })
+        if (result.ok) {
+            setModalOpened(false)
+            setModal({ title: "", elements: <></> })
+            toast.success("Tranzakció sikeresen hozzáadásra került!")
+            loadUserData()
         } else {
             const resultJson = await result.json()
             toast.error(resultJson.message)
@@ -178,6 +206,26 @@ export function AddTransactionModal({ type, setModal, setModalOpened, setPool, s
                             {balances.map((balance) => (<option key={balance.poolId} value={balance.poolId}>{balance.poolName}</option>))}
                         </select>
                     </div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
+                        <p>Kávé mennyisége:</p>
+                        <input type="number" required name="coffeeAmount" placeholder="Súly grammban" />
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
+                        <p>Kávé értéke:</p>
+                        <input type="number" required name="moneyAmount" placeholder="Érték forintban" />
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
+                        <input type="submit" value="Hozzáadás" style={{ width: "100%", margin: "3px" }} />
+                        <input type="button" className="dangerButton" style={{ width: "100%", margin: "3px" }} onClick={() => {
+                            setModalOpened(false)
+                            setModal({ title: "", elements: <></> })
+                        }} value="Mégse" />
+                    </div>
+                </form>
+            )
+        case "globalTransaction":
+            return (
+                <form className="newTransactionForm" action="" onSubmit={globalTransactionAction}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "5px" }}>
                         <p>Kávé mennyisége:</p>
                         <input type="number" required name="coffeeAmount" placeholder="Súly grammban" />

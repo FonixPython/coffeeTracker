@@ -39,7 +39,7 @@ export function AdminUsers({ users, setModalOpened, setModal, reload, variations
     return (
         <>
             {users.map((user) => (
-                <AdminUserCard user={user} setModalOpened={setModalOpened} setModal={setModal} reload={reload} variations={variations} />
+                <AdminUserCard key={user.id} user={user} setModalOpened={setModalOpened} setModal={setModal} reload={reload} variations={variations} />
             ))}
         </>
     )
@@ -248,7 +248,7 @@ function AdminUserCard({ user, setModalOpened, setModal, reload, variations }: U
             }>
             <hr />
             {user.transactions.length > 0 ? user.transactions.map((transaction) => (
-                <AdminTransactionCard transaction={transaction} setModalOpened={setModalOpened} setModal={setModal} reload={reload} variations={variations || []} pool={false} />
+                <AdminTransactionCard key={transaction.id + user.id} transaction={transaction} setModalOpened={setModalOpened} setModal={setModal} reload={reload} variations={variations || []} pool={false} />
             )) : <p style={{ textAlign: "center", fontWeight: 200, color: "var(--text-muted)", margin: "15px" }}>Még nincsenek tranzakciók!</p>}
         </SectionCard>
     )
