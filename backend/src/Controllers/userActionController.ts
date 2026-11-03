@@ -93,7 +93,7 @@ export async function addTransaction(req: Request & Record<string, any>, res: Re
                     return res.status(500).json({ message: "No coffee" })
                 }
 
-                const poolCoffeeAmount = await prisma.transaction.aggregate({ where: { poolId: req.body.poolId, type: { in: ["drink", "addCoffee", "useMoney"] } }, _sum: { coffeeAmount: true } })
+                const poolCoffeeAmount = await prisma.transaction.aggregate({ where: { poolId: req.body.poolId, type: { in: ["drink", "addCoffee", "useMoney", "globalTransaction"] } }, _sum: { coffeeAmount: true } })
                 const userMoneyAmount = await prisma.transaction.aggregate({ where: { poolId: req.body.poolId, userId: req.user.id }, _sum: { moneyAmount: true } })
                 if (req.body.coffeeVariation != null) {
                     const variation = await prisma.coffeeVariation.findFirstOrThrow({ where: { id: req.body.coffeeVariation } })
@@ -221,7 +221,7 @@ export async function editTransaction(req: Request & Record<string, any>, res: R
                     return res.status(500).json({ message: "No coffee" })
                 }
 
-                const poolCoffeeAmount = await prisma.transaction.aggregate({ where: { poolId: req.body.poolId, type: { in: ["drink", "addCoffee", "useMoney"] } }, _sum: { coffeeAmount: true } })
+                const poolCoffeeAmount = await prisma.transaction.aggregate({ where: { poolId: req.body.poolId, type: { in: ["drink", "addCoffee", "useMoney","globalTransaction"] } }, _sum: { coffeeAmount: true } })
                 const userMoneyAmount = await prisma.transaction.aggregate({ where: { poolId: req.body.poolId, userId: req.user.id }, _sum: { moneyAmount: true } })
                 if (req.body.coffeeVariation != null) {
                     const variation = await prisma.coffeeVariation.findFirstOrThrow({ where: { id: req.body.coffeeVariation } })
